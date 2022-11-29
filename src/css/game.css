@@ -1,0 +1,66 @@
+body {
+    margin-left: 42%;
+}
+
+#result {
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+.hidden {
+    display: none;
+}
+
+#restart-game {
+    margin-left: 20px;
+}
+
+.restart-game-button {
+    background-color: cyan;
+    height: 100px;
+    width: 150px;
+    font-size: 30px;
+}
+
+.hit {
+    background-color: lightgreen;
+    font-size: large;
+}
+
+.double-down {
+    background-color: gold;
+    font-size: medium;
+}
+
+.split {
+    background-color: orchid;
+    font-size: large;
+}
+
+.stand {
+    background-color: orangered;
+    font-size: large;
+}
+
+.action-button {
+    margin-left: 10px;
+    height: 50px;
+    width: 80px;
+}
+
+#PlayerHand {
+    margin-top: 40px;
+}
+
+.action-buttons {
+    margin-top: 30px;
+    display: flex;
+}
+
+#result {
+    font-size: 50px;
+}
+
+.card-totals {
+    margin-top: 3px;
+}
