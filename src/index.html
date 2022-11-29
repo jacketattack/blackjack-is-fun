@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#000000" />
+    <meta
+      name="description"
+      content="Web site created using create-react-app"
+    />
+    <title>Blackjack</title>
+  </head>
+  <body>
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <div id="root"></div>
+      <h1>Let's Play Blackjack!</h1>
+
+      <div id="DealerHand">
+        <h3>DEALER</h3>
+        <span id="visualDealerHand"></span>
+        <div class="card-totals">
+          <strong>TOTAL: </strong><span id="dealerTotal"></span>
+        </div>
+      </div>
+
+      <div id="PlayerHand">
+        <h3>PLAYER</h3>
+        <span id="visualPlayerHand"></span>
+        <div class="card-totals">
+          <strong>TOTAL: </strong><span id="playerTotal"></span>
+        </div>
+      </div>
+
+      <div class="action-buttons" id="action-buttons">
+        <button class="action-button hit" onClick="hit()">HIT</button>
+        <button id="double-down" class="action-button double-down" onClick="doubleDown()" title="Double your bet and get EXACTLY one more hit">DOUBLE DOWN</button>
+        <button id="split" class="action-button split" onClick="split()" disabled>SPLIT</button>
+        <button class="action-button stand" onClick="playForDealer()">STAND</button>
+      </div>
+
+      <div id="result"></div>
+      <div id="restart-game" class="hidden">
+        <button class="restart-game-button" onClick="restartGame()">New Game</button>
+      </div>
+    </body>
+
+    <script src="js/game.js"></script>
+    <link rel="stylesheet" href="css/game.css" />
+    
+</html>
