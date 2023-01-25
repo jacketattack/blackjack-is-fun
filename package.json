@@ -1,12 +1,12 @@
 {
-  "name": "craps",
+  "name": "blackjack-is-fun",
   "version": "1.0.0",
-  "description": "easy five!",
+  "description": "Play blackjack!",
   "main": "index.js",
   "scripts": {
     "start": "parcel src/index.html"
   },
-  "author": "Tawg",
+  "author": "jacketattack",
   "license": "ISC",
   "devDependencies": {
     "parcel": "^2.7.0"
