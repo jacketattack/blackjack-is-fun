@@ -5,8 +5,8 @@
   "browserslist": "> 0.5%, last 2 versions, not dead",
   "scripts": {
     "build": "parcel build src/indexReact.html --no-cache",
-    "start": "parcel serve src/indexReact.html",
-    "startOld": "parcel src/index.html"
+    "start": "parcel serve src/indexReact.html --no-cache",
+    "startOld": "parcel src/index.html --no-cache"
   },
   "author": "jacketattack",
   "license": "ISC",
