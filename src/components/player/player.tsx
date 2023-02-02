@@ -1,5 +1,16 @@
-import React from 'react';
+import { Card } from "../../interfaces/card.interface";
+import { HandOfCards } from "../hand-of-cards/hand-of-cards";
 
-export function Player() {
-    return <h1>I'm a player</h1>;
+interface PlayerProps {
+    name: string;
+    cards: Card[];
 }
+
+export const Player: React.FC<PlayerProps> = (props: PlayerProps) => {
+    return (
+        <>
+            <h3>{props.name}</h3>
+            <HandOfCards cards={props.cards} />
+        </>
+    );
+} 
