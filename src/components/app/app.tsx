@@ -1,10 +1,7 @@
-import { Title } from '../title/title';
-import { HandOfCards }  from '../hand-of-cards/hand-of-cards';
-import { CardSuit, CardValue } from '../../interfaces/card.interface';
-import { sample } from 'lodash';
-import * as styles from './app.module.css';
-import { Player } from '../player/player';
 import dealHand from '../../services/dealHand';
+import { Player } from '../player/player';
+import { Title } from '../title/title';
+import * as styles from './app.module.css';
 
 export function App() {
     /**
@@ -19,7 +16,7 @@ export function App() {
     return (
         <div className={styles.game}>
             <Title />
-            <Player name="Dealer" cards={dealHand()} />
+            <Player name="DEALER" cards={dealHand()} />
         </div>
     );
 }

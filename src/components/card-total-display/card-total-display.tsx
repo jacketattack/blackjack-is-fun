@@ -14,10 +14,12 @@ export const CardTotalDisplay: React.FC<CardTotalProps> = (props: CardTotalProps
     return (
         <>
             {isBlackjack &&
-                <span className={styles.blackjack}>BLACKJACK</span>
+                <div className={styles.blackjack}>BLACKJACK</div>
             }
             {!isBlackjack &&
-                <span className={styles.standard}>Total: {cardTotal.isSoft && cardTotal.total !== 21 ? 'Soft ' : null} {cardTotal.total}</span>
+                <div className={styles.standard}>
+                    <span className={styles.total}>Total:</span> {cardTotal.isSoft && cardTotal.total !== 21 ? 'Soft ' : null} {cardTotal.total}
+                </div>
             }
         </>
     );
