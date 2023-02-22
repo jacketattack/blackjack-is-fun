@@ -62,9 +62,16 @@ const cardToUrl: { [key: string]: URL } = {
     'ace_of_hearts': new URL('../../../public/images/ace_of_hearts.png', import.meta.url),
     'ace_of_clubs': new URL('../../../public/images/ace_of_clubs.png', import.meta.url),
     'ace_of_spades': new URL('../../../public/images/ace_of_spades.png', import.meta.url),
+    'back_of_card': new URL('../../../public/images/back_of_card.png', import.meta.url)
 };
 
 function getUrlOfCard(card: Card): URL {
-    return cardToUrl[`${card.value}_of_${card.suit}`];
+    let cardUrl: URL;
+    if (!card) {
+        cardUrl = cardToUrl['back_of_card'];
+    } else {
+        cardUrl = cardToUrl[`${card.value}_of_${card.suit}`];
+    }
+    return cardUrl;
 }
 

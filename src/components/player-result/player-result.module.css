@@ -1,0 +1,15 @@
+.result {
+    font-size: 100px;
+}
+
+.winner {
+    color: green;
+}
+
+.loser {
+    color: red;
+}
+
+.push {
+    color: yellow
+}
