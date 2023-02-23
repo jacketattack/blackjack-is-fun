@@ -4,9 +4,9 @@
   "description": "Play blackjack!",
   "browserslist": "> 0.5%, last 2 versions, not dead",
   "scripts": {
-    "build": "tcm src && parcel build indexReact.html public/**/* --no-cache",
-    "start": "parcel serve indexReact.html public/**/* --no-cache",
-    "startOld": "parcel src/index.html --no-cache",
+    "build": "tcm src && parcel build index.html public/**/* --no-cache",
+    "start": "parcel serve index.html public/**/* --no-cache",
+    "startOld": "parcel src/indexOld.html --no-cache",
     "test": "jest"
   },
   "author": "jacketattack",
