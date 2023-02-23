@@ -1,0 +1,30 @@
+.hit {
+    background-color: lightgreen;
+    font-size: large;
+}
+
+.doubleDown {
+    background-color: gold;
+    font-size: medium;
+}
+
+.split {
+    background-color: orchid;
+    font-size: large;
+}
+
+.stand {
+    background-color: orangered;
+    font-size: large;
+}
+
+.actionButton {
+    margin-left: 10px;
+    height: 50px;
+    width: 80px;
+}
+
+.actionButtons {
+    margin-top: 30px;
+    display: flex;
+}

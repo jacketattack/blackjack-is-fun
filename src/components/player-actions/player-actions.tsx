@@ -1,4 +1,6 @@
+import classNames from "classnames";
 import { Card } from "../../interfaces/card.interface";
+import * as styles from './player-actions.module.css';
 
 interface PlayerActionsProps {
     handOfCards: Card[];
@@ -10,11 +12,21 @@ interface PlayerActionsProps {
 
 export const PlayerActions: React.FC<PlayerActionsProps> = (props: PlayerActionsProps) => {
     return (
-        <div>
-            <button onClick={props.onHit}>HIT</button>
-            <button onClick={props.onDoubleDown} disabled={!canDoubleDown(props.handOfCards)}>DOUBLE DOWN</button>
-            <button onClick={props.onSplit} disabled={!canSplit(props.handOfCards)}>SPLIT</button>
-            <button onClick={props.onStand}>STAND</button>
+        <div className={styles.actionButtons}>
+            <button onClick={props.onHit} className={classNames(styles.actionButton, styles.hit)}>HIT</button>
+            <button
+                onClick={props.onDoubleDown}
+                disabled={!canDoubleDown(props.handOfCards)}
+                className={classNames(styles.actionButton, styles.doubleDown)}>
+                DOUBLE DOWN
+            </button>
+            <button
+                onClick={props.onSplit}
+                disabled={!canSplit(props.handOfCards)}
+                className={classNames(styles.actionButton, styles.split)}>
+                SPLIT
+            </button>
+            <button onClick={props.onStand} className={classNames(styles.actionButton, styles.stand)}>STAND</button>
         </div>
     );
 }
