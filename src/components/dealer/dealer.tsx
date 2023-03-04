@@ -1,7 +1,9 @@
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
-import { Card, CardSuit, CardValue } from '../../interfaces/card.interface';
+
+import { Card } from '../../interfaces/card.interface';
 import { playDealerHand } from '../../services/dealerStrategy';
 import { dealHand } from '../../services/deck';
+import calculateHandOfCardsTotal from '../../services/handOfCardsCalculation';
 import { HandOfCards } from '../hand-of-cards/hand-of-cards';
 import * as styles from './dealer.module.css';
 
@@ -11,32 +13,15 @@ interface DealerProps {
     onDrewBlackjack(): void;
 }
 
-
 export const Dealer: React.FC<DealerProps> = (props: DealerProps) => {
-    let blackjack: Card[] = [
-        {
-            value: CardValue.ACE,
-            suit: CardSuit.CLUBS
-        },
-        {
-            value: CardValue.JACK,
-            suit: CardSuit.CLUBS
-        }
-    ]
     let [handOfCards, setHandOfCards]: [Card[], Dispatch<SetStateAction<Card[]>>] = useState(dealHand());
     useEffect(() => {
-        if (props.playerFinalTotal) {
-            if (props.playerFinalTotal && props.playerFinalTotal < 22) {
-                setHandOfCards(playDealerHand(handOfCards));
-            }
-        }
-    }, [props.playerFinalTotal]);
-
-    useEffect(() => {
-        if (props.playerFinalTotal) {
+        if (hasPlayerFinishedPlaying() && !hasPlayerBusted()) {
+            const dealerFinalHand: Card[] = playDealerHand(handOfCards);
+            setHandOfCards(dealerFinalHand);
             props.onHasFinishedPlaying(handOfCards);
         }
-    }, [handOfCards]);
+    }, [props.playerFinalTotal]);
 
     function onTotalTwentyOne(): void {
         if (handOfCards.length === 2) {
@@ -49,10 +34,26 @@ export const Dealer: React.FC<DealerProps> = (props: DealerProps) => {
         return handOfCards.length === 2 && !props.playerFinalTotal;
     }
 
+    function hasPlayerFinishedPlaying(): boolean {
+      return !!props.playerFinalTotal;
+    }
+
+    function hasPlayerBusted(): boolean {
+      return props.playerFinalTotal > 21;
+    }
+
+    function dealerTotalIsTwentyOne(): boolean {
+      return calculateHandOfCardsTotal(handOfCards).total === 21;
+    }
+
+    function getCardsToDisplay(): Card[] {
+      return isDealerOpeningHand() && !dealerTotalIsTwentyOne() ? [handOfCards[0]] : handOfCards;
+    }
+
     return (
         <div className={styles.dealer}>
             <div className={styles.name}>DEALER</div>
-            <HandOfCards cards={handOfCards} onTotalTwentyOne={onTotalTwentyOne} dealerOpeningHand={isDealerOpeningHand()}/>
+            <HandOfCards cards={getCardsToDisplay()} onTotalTwentyOne={onTotalTwentyOne}/>
         </div>
     );
 } 

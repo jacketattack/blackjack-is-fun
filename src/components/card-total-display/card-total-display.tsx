@@ -1,7 +1,8 @@
-import { ReactElement, useEffect } from "react";
-import useHandOfCardsTotal from "../../hooks/useHandOfCardsTotal";
-import { Card } from "../../interfaces/card.interface";
-import { CardTotal } from "../../services/handOfCardsCalculation";
+import { ReactElement, useEffect } from 'react';
+
+import useHandOfCardsTotal from '../../hooks/useHandOfCardsTotal';
+import { Card } from '../../interfaces/card.interface';
+import { CardTotal } from '../../services/handOfCardsCalculation';
 import * as styles from './card-total-display.module.css';
 
 interface CardTotalProps {
@@ -13,6 +14,7 @@ interface CardTotalProps {
 export const CardTotalDisplay: React.FC<CardTotalProps> = (props: CardTotalProps): ReactElement => {
     const cardTotal: CardTotal = useHandOfCardsTotal(props.cards);
     const isBlackjack: boolean = cardTotal.total === 21 && props.cards.length == 2;
+
     useEffect(() => {
         if (cardTotal.total === 21) {
             props.onTotalTwentyOne ? props.onTotalTwentyOne() : null;
@@ -20,6 +22,7 @@ export const CardTotalDisplay: React.FC<CardTotalProps> = (props: CardTotalProps
             props.onBust ? props.onBust() : null;
         }
     }, [cardTotal]);
+
     return (
         <>
             {
