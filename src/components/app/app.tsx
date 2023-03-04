@@ -1,4 +1,5 @@
 import { Dispatch, SetStateAction, useState } from 'react';
+
 import { Card } from '../../interfaces/card.interface';
 import calculateHandOfCardsTotal from '../../services/handOfCardsCalculation';
 import { Dealer } from '../dealer/dealer';
@@ -14,15 +15,6 @@ interface AppState {
 }
 
 export function App() {
-    /**
-     * We have a Player
-     * - playerName
-     * - hand & total
-     * - buttons for player
-     * 
-     * could just make two separate 'dealer' and 'player' components
-     * the player component would have the buttons and such
-     */
     let [appState, setAppState]: [AppState, Dispatch<SetStateAction<AppState>>] = useState(
         {
             dealerFinalTotal: null,
