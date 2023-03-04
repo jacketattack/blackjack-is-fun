@@ -1,8 +1,9 @@
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
-import { Card } from "../../interfaces/card.interface";
-import { dealHand, drawCard } from "../../services/deck";
-import { HandOfCards } from "../hand-of-cards/hand-of-cards";
-import { PlayerActions } from "../player-actions/player-actions";
+import { Dispatch, SetStateAction, useEffect, useState } from 'react';
+
+import { Card } from '../../interfaces/card.interface';
+import { dealHand, drawCard } from '../../services/deck';
+import { HandOfCards } from '../hand-of-cards/hand-of-cards';
+import { PlayerActions } from '../player-actions/player-actions';
 import * as styles from './player.module.css';
 
 interface PlayerProps {
@@ -37,11 +38,12 @@ export const Player: React.FC<PlayerProps> = (props: PlayerProps) => {
     }
 
     function doubleDown(): void {
+        const finalPlayerHand: Card[] = [...playerState.handOfCards, drawCard()];
         setPlayerState({
-            handOfCards: [...playerState.handOfCards, drawCard()],
+            handOfCards: finalPlayerHand,
             canPerformMoreActions: false
         });
-        props.onHasFinishedActions(playerState.handOfCards);
+        props.onHasFinishedActions(finalPlayerHand);
     }
 
     function split(): void {

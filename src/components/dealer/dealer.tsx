@@ -19,7 +19,7 @@ export const Dealer: React.FC<DealerProps> = (props: DealerProps) => {
         if (hasPlayerFinishedPlaying() && !hasPlayerBusted()) {
             const dealerFinalHand: Card[] = playDealerHand(handOfCards);
             setHandOfCards(dealerFinalHand);
-            props.onHasFinishedPlaying(handOfCards);
+            props.onHasFinishedPlaying(dealerFinalHand);
         }
     }, [props.playerFinalTotal]);
 
