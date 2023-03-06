@@ -5,6 +5,7 @@
         "parcel-transformer-ts-css-modules",
         "..."
       ]
-    }
+    },
+    "reporters": ["...", "@parcel/reporter-bundle-analyzer"]
 }
   
