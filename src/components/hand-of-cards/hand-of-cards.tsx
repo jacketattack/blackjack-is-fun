@@ -2,6 +2,7 @@
 import { Card } from '../../interfaces/card.interface';
 import { CardImage } from '../card-image/card-image';
 import { CardTotalDisplay } from '../card-total-display/card-total-display';
+import * as styles from './hand-of-cards.module.css';
 
 interface HandOfCardsProps {
     cards: Card[];
@@ -30,12 +31,12 @@ export const HandOfCards = (props: HandOfCardsProps) => {
 
   return (
       <>
-          <div>
+          <div className={styles.hand}>
               {cardsToDisplay.map((card: Card, index: number) => (
                   <span key={index}><CardImage card={card}/></span>
               ))}
+            <CardTotalDisplay cards={props.cards} onBust={props.onBust} onTotalTwentyOne={props.onTotalTwentyOne}/>
           </div>
-          <CardTotalDisplay cards={props.cards} onBust={props.onBust} onTotalTwentyOne={props.onTotalTwentyOne}/>
       </>
   );
 }

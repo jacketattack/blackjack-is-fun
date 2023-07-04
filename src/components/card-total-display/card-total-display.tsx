@@ -27,17 +27,17 @@ export const CardTotalDisplay = (props: CardTotalProps) => {
         <>
             {
                 isBlackjack &&
-                    <div className={styles.blackjack}>BLACKJACK</div>
+                    <div className={`${styles.blackjack} ${styles.leftSpacing}`}>BLACKJACK</div>
             }
             {
                 !isBlackjack && cardTotal.total < 22 &&
-                    <div className={styles.standard}>
+                    <div className={`${styles.standard} ${styles.leftSpacing}`}>
                         <span className={styles.total}>Total:</span> {cardTotal.isSoft && cardTotal.total !== 21 ? 'Soft ' : null} {cardTotal.total}
                     </div>
             }
             {
                 !isBlackjack && cardTotal.total >= 22 &&
-                    <div className={styles.bust}>BUST</div>
+                    <div className={`${styles.bust} ${styles.leftSpacing}`}>BUST</div>
             }
         </>
     );
