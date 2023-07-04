@@ -1,3 +1,3 @@
-export const Title: React.FC = () => {
+export const Title = () => {
     return <h1>Let's Play Blackjack!</h1>
 }

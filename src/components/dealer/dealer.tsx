@@ -13,7 +13,7 @@ interface DealerProps {
     onDrewBlackjack(): void;
 }
 
-export const Dealer: React.FC<DealerProps> = (props: DealerProps) => {
+export const Dealer = (props: DealerProps) => {
     let [handOfCards, setHandOfCards]: [Card[], Dispatch<SetStateAction<Card[]>>] = useState(dealHand());
     useEffect(() => {
         if (hasPlayerFinishedPlaying() && !hasPlayerBusted()) {

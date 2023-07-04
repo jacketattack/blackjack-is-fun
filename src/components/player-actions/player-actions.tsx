@@ -10,7 +10,7 @@ interface PlayerActionsProps {
     onStand(): void;
 }
 
-export const PlayerActions: React.FC<PlayerActionsProps> = (props: PlayerActionsProps) => {
+export const PlayerActions = (props: PlayerActionsProps) => {
     return (
         <div className={styles.actionButtons}>
             <button onClick={props.onHit} className={classNames(styles.actionButton, styles.hit)}>HIT</button>

@@ -1,4 +1,3 @@
-import React, { ReactElement } from 'react';
 
 import { Card } from '../../interfaces/card.interface';
 import { CardImage } from '../card-image/card-image';
@@ -12,7 +11,7 @@ interface HandOfCardsProps {
 
 const BACK_OF_CARD: Card = null; // CardImage component shows back of card when given null
 
-export const HandOfCards: React.FC<HandOfCardsProps> = (props: HandOfCardsProps): ReactElement => {
+export const HandOfCards = (props: HandOfCardsProps) => {
 
   let cardsToDisplay: Card[];
   if (onlyOneCardToDisplay()) {

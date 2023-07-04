@@ -1,4 +1,4 @@
-import { ReactElement, useEffect } from 'react';
+import { useEffect } from 'react';
 
 import useHandOfCardsTotal from '../../hooks/useHandOfCardsTotal';
 import { Card } from '../../interfaces/card.interface';
@@ -11,7 +11,7 @@ interface CardTotalProps {
     onTotalTwentyOne?(): void;
 }
 
-export const CardTotalDisplay: React.FC<CardTotalProps> = (props: CardTotalProps): ReactElement => {
+export const CardTotalDisplay = (props: CardTotalProps) => {
     const cardTotal: CardTotal = useHandOfCardsTotal(props.cards);
     const isBlackjack: boolean = cardTotal.total === 21 && props.cards.length == 2;
 

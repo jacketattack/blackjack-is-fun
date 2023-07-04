@@ -17,7 +17,7 @@ interface PlayerState {
     canPerformMoreActions: boolean;
 }
 
-export const Player: React.FC<PlayerProps> = (props: PlayerProps) => {
+export const Player = (props: PlayerProps) => {
     let [playerState, setPlayerState]: [PlayerState, Dispatch<SetStateAction<PlayerState>>] = useState(
         {
             handOfCards: dealHand(),

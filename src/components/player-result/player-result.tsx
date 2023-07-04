@@ -1,4 +1,3 @@
-import { ReactElement } from "react";
 import * as styles from './player-result.module.css';
 
 interface PlayerResultProps {
@@ -6,7 +5,7 @@ interface PlayerResultProps {
     playerFinalTotal: number;
 }
 
-export const PlayerResult: React.FC<PlayerResultProps> = (props: PlayerResultProps): ReactElement => {
+export const PlayerResult = (props: PlayerResultProps) => {
     let didPlayerWin = hasPlayerWon(props.dealerFinalTotal, props.playerFinalTotal);
     let didPlayerPush = hasPlayerPushed(props.dealerFinalTotal, props.playerFinalTotal);
 

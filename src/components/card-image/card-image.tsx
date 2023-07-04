@@ -1,11 +1,10 @@
-import { ReactElement } from "react";
 import { Card } from "../../interfaces/card.interface";
 
 interface CardImageProps {
     card: Card;
 }
 
-export const CardImage: React.FC<CardImageProps> = (props: CardImageProps): ReactElement => {
+export const CardImage = (props: CardImageProps) => {
     return <img src={getUrlOfCard(props.card)} height="200" width="100"/>;
 }
 
