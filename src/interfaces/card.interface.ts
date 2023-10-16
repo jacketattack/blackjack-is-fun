@@ -1,6 +1,11 @@
+export interface BlackjackHand {
+    cards: Card[]
+    finished: boolean
+}
+
 export interface Card {
-    value: CardValue;
-    suit: CardSuit;
+    value: CardValue
+    suit: CardSuit
 }
 
 export enum CardValue {
@@ -16,12 +21,12 @@ export enum CardValue {
     JACK = 'jack',
     QUEEN = 'queen',
     KING = 'king',
-    ACE = 'ace'
+    ACE = 'ace',
 }
 
 export enum CardSuit {
     DIAMONDS = 'diamonds',
     HEARTS = 'hearts',
     CLUBS = 'clubs',
-    SPADES = 'spades'
+    SPADES = 'spades',
 }

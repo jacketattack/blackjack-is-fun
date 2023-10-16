@@ -1,58 +1,60 @@
-import { Dispatch, SetStateAction, useState } from 'react';
+import { Dispatch, SetStateAction, useState } from 'react'
 
-import { Card } from '../../interfaces/card.interface';
-import calculateHandOfCardsTotal from '../../services/handOfCardsCalculation';
-import { Dealer } from '../dealer/dealer';
-import { PlayerResult } from '../player-result/player-result';
-import { Player } from '../player/player';
-import { Title } from '../title/title';
-import * as styles from './app.module.css';
+import { BlackjackHand, Card } from '../../interfaces/card.interface'
+import calculateHandOfCardsTotal from '../../services/handOfCardsCalculation'
+import { Dealer } from '../dealer/dealer'
+import { Player } from '../player/player'
+import { Title } from '../title/title'
+import * as styles from './app.module.css'
 
 interface AppState {
-    dealerFinalTotal: number;
-    playerFinalTotal: number;
-    dealerDrewBlackjack: boolean;
+    playerFinalTotals: number[]
+    dealerHand: Card[]
 }
 
 export function App() {
-    let [appState, setAppState]: [AppState, Dispatch<SetStateAction<AppState>>] = useState(
-        {
-            dealerFinalTotal: null,
-            playerFinalTotal: null,
-            dealerDrewBlackjack: false
-        }
-    );
+    let [appState, setAppState]: [
+        AppState,
+        Dispatch<SetStateAction<AppState>>,
+    ] = useState({
+        playerFinalTotals: [],
+        dealerHand: [],
+    })
 
-    function notifyDealerToPlay(playerFinalHandOfCards: Card[]): void {
-        const playerFinalTotal: number = calculateHandOfCardsTotal(playerFinalHandOfCards).total;
+    function notifyDealerToPlay(
+        playerFinalHandsOfCards: BlackjackHand[]
+    ): void {
+        const playerFinalTotals: number[] = playerFinalHandsOfCards.map(
+            (hand: BlackjackHand) => calculateHandOfCardsTotal(hand.cards).total
+        )
+
         setAppState({
             ...appState,
-            playerFinalTotal
-        });
-    }
-
-    function setDealerFinalHandOfCards(dealerFinalHandOfCards: Card[]): void {
-        const dealerFinalTotal: number = calculateHandOfCardsTotal(dealerFinalHandOfCards).total;
-        setAppState({
-            ...appState,
-            dealerFinalTotal
+            playerFinalTotals,
         })
     }
 
-    function onDealerDrewBlackjack(): void {
+    function setDealerFinalHandOfCards(dealerFinalHandOfCards: Card[]): void {
         setAppState({
             ...appState,
-            dealerFinalTotal: 21,
-            dealerDrewBlackjack: true
-        });
+            dealerHand: dealerFinalHandOfCards,
+        })
     }
 
     return (
-        <div className={styles.game}>
-            <Title />
-            <Dealer playerFinalTotal={appState.playerFinalTotal} onHasFinishedPlaying={setDealerFinalHandOfCards} onDrewBlackjack={onDealerDrewBlackjack}/>
-            <Player name="PLAYER" onHasFinishedActions={notifyDealerToPlay} dealerDrewBlackjack={appState.dealerDrewBlackjack}/>
-            { appState.playerFinalTotal && appState.dealerFinalTotal && <PlayerResult playerFinalTotal={appState.playerFinalTotal} dealerFinalTotal={appState.dealerFinalTotal}/>}
-        </div>
-    );
+        <>
+            <div className={styles.game}>
+                <Title />
+                <Dealer
+                    playerFinalTotals={appState.playerFinalTotals}
+                    onHasFinishedPlaying={setDealerFinalHandOfCards}
+                />
+                <Player
+                    name="PLAYER"
+                    onHasFinishedActions={notifyDealerToPlay}
+                    dealerHand={appState.dealerHand}
+                />
+            </div>
+        </>
+    )
 }
