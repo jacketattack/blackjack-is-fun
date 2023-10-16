@@ -1,6 +1,7 @@
 declare const styles: {
     readonly player: string
     readonly name: string
-    readonly cards: string
+    readonly hands: string
+    readonly hand: string
 }
 export = styles

@@ -52,7 +52,7 @@ export const Player = (props: PlayerProps) => {
             addCardToActiveHand()
         finishActiveHand(handsOfCardsWithActiveHandHit)
 
-        const newActiveHandIndex: number = playerState.activeHandIndex + 1
+        const newActiveHandIndex: number = getNextActiveHandIndex()
         setPlayerState({
             blackjackHands: handsOfCardsWithActiveHandHit,
             activeHandIndex: newActiveHandIndex,
@@ -64,14 +64,38 @@ export const Player = (props: PlayerProps) => {
     }
 
     function split(): void {
-        // create new hand with first card being two cards in current hand
+        const splitCard: Card =
+            playerState.blackjackHands[playerState.activeHandIndex].cards[0]
+        const splitHands: BlackjackHand[] = [
+            {
+                cards: [splitCard, drawCard()],
+                finished: false,
+            },
+            {
+                cards: [splitCard, drawCard()],
+                finished: false,
+            },
+        ]
+        const copyOfBlackjackHands: BlackjackHand[] = [
+            ...playerState.blackjackHands,
+        ]
+        copyOfBlackjackHands.splice(
+            playerState.activeHandIndex,
+            1,
+            ...splitHands
+        )
+
+        setPlayerState({
+            ...playerState,
+            blackjackHands: copyOfBlackjackHands,
+        })
     }
 
     function stand(): void {
-        const newActiveHandIndex: number = playerState.activeHandIndex + 1
+        const newActiveHandIndex: number = getNextActiveHandIndex()
+
         setPlayerState({
-            ...playerState,
-            blackjackHands: finishActiveHand(),
+            blackjackHands: finishActiveHand(playerState.blackjackHands),
             activeHandIndex: newActiveHandIndex,
         })
 
@@ -80,11 +104,18 @@ export const Player = (props: PlayerProps) => {
         }
     }
 
-    function bust(): void {
-        stand()
+    function handleNoMoreCardsAllowed(): void {
+        if (
+            !playerIsFinished() &&
+            !playerState.blackjackHands[playerState.activeHandIndex].finished
+        ) {
+            stand()
+        }
     }
 
-    function playerIsFinished(activeHandIndex: number): boolean {
+    function playerIsFinished(
+        activeHandIndex: number = playerState.activeHandIndex
+    ): boolean {
         return activeHandIndex >= getNumberOfHands()
     }
 
@@ -107,7 +138,7 @@ export const Player = (props: PlayerProps) => {
     }
 
     function finishActiveHand(
-        blackjackHands: BlackjackHand[] = playerState.blackjackHands
+        blackjackHands: BlackjackHand[]
     ): BlackjackHand[] {
         const copyOfBlackjackHands: BlackjackHand[] = [...blackjackHands]
         copyOfBlackjackHands[playerState.activeHandIndex].finished = true
@@ -115,20 +146,25 @@ export const Player = (props: PlayerProps) => {
         return copyOfBlackjackHands
     }
 
+    function getNextActiveHandIndex(): number {
+        let updatedHandIndex: number = playerState.activeHandIndex + 1
+
+        return updatedHandIndex
+    }
+
     return (
         <div className={styles.player}>
             <div className={styles.name}>{props.name}</div>
-            <div className={styles.cards}>
+            <div className={styles.hands}>
                 {playerState.blackjackHands.map(
                     (hand: BlackjackHand, index: number) => (
-                        <>
+                        <div className={styles.hand} key={index}>
                             <HandOfCards
-                                key={index}
                                 blackjackHand={hand}
-                                onBust={bust}
-                                onTotalTwentyOne={stand}
+                                onBust={handleNoMoreCardsAllowed}
+                                onTotalTwentyOne={handleNoMoreCardsAllowed}
                             />
-                            {hand.finished && (
+                            {playerIsFinished() && (
                                 <PlayerHandResult
                                     dealerFinalTotal={dealerHandTotal.total}
                                     playerFinalTotal={
@@ -137,21 +173,21 @@ export const Player = (props: PlayerProps) => {
                                     }
                                 />
                             )}
-                        </>
+                            {playerState.activeHandIndex === index && (
+                                <PlayerActions
+                                    handOfCards={
+                                        playerState.blackjackHands[
+                                            playerState.activeHandIndex
+                                        ].cards
+                                    }
+                                    onHit={hit}
+                                    onDoubleDown={doubleDown}
+                                    onSplit={split}
+                                    onStand={stand}
+                                />
+                            )}
+                        </div>
                     )
-                )}
-                {!playerIsFinished(playerState.activeHandIndex) && (
-                    <PlayerActions
-                        handOfCards={
-                            playerState.blackjackHands[
-                                playerState.activeHandIndex
-                            ].cards
-                        }
-                        onHit={hit}
-                        onDoubleDown={doubleDown}
-                        onSplit={split}
-                        onStand={stand}
-                    />
                 )}
             </div>
         </div>

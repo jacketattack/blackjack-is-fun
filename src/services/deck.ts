@@ -19,3 +19,19 @@ export function drawCard(): Card {
         suit: sample(Object.values(CardSuit)) as CardSuit,
     }
 }
+
+export function drawPair(): BlackjackHand {
+    return {
+        cards: [
+            {
+                value: CardValue.TWO,
+                suit: CardSuit.CLUBS,
+            },
+            {
+                value: CardValue.TWO,
+                suit: CardSuit.CLUBS,
+            },
+        ],
+        finished: false,
+    }
+}

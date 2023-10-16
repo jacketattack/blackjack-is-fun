@@ -8,6 +8,10 @@
     font-weight: 600;
 }
 
-.cards {
+.hands {
+    display: block;
+}
+
+.hand {
     display: flex;
 }
