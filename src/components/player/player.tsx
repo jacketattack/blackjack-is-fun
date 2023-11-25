@@ -13,7 +13,7 @@ import * as styles from './player.module.css'
 
 interface PlayerProps {
     name: string
-    dealerHand: Card[]
+    dealerHand: BlackjackHand
     onHasFinishedActions(playerFinalHandsOfCards: BlackjackHand[]): void
 }
 
@@ -31,7 +31,9 @@ export const Player = (props: PlayerProps) => {
         activeHandIndex: 0,
     })
 
-    const dealerHandTotal: CardTotal = useHandOfCardsTotal(props.dealerHand)
+    const dealerHandTotal: CardTotal = useHandOfCardsTotal(
+        props.dealerHand.cards
+    )
     useEffect(() => {
         if (dealerHandTotal.blackjack) {
             stand()
