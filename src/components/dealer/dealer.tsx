@@ -9,7 +9,7 @@ import * as styles from './dealer.module.css'
 
 interface DealerProps {
     playerFinalTotals: number[]
-    onHasFinishedPlaying(dealerFinalHandOfCards: Card[]): void
+    onHasFinishedPlaying(dealerFinalHand: BlackjackHand): void
 }
 
 interface DealerState {
@@ -24,17 +24,29 @@ export const Dealer = (props: DealerProps) => {
         blackjackHand: dealHand(),
     })
     useEffect(() => {
-        if (hasPlayerFinishedPlaying() && !hasPlayerBusted()) {
-            const dealerFinalHand: Card[] = playDealerHand(
-                dealerState.blackjackHand.cards
-            )
-            setDealerState({
-                blackjackHand: {
-                    cards: dealerFinalHand,
-                    finished: true,
-                },
-            })
-            props.onHasFinishedPlaying(dealerFinalHand)
+        if (hasPlayerFinishedPlaying()) {
+            let finalDealerState: DealerState
+            if (hasPlayerBusted()) {
+                finalDealerState = {
+                    blackjackHand: {
+                        ...dealerState.blackjackHand,
+                        finished: true,
+                    },
+                }
+            } else {
+                const dealerFinalHand: Card[] = playDealerHand(
+                    dealerState.blackjackHand.cards
+                )
+
+                finalDealerState = {
+                    blackjackHand: {
+                        cards: dealerFinalHand,
+                        finished: true,
+                    },
+                }
+            }
+            setDealerState(finalDealerState)
+            props.onHasFinishedPlaying(finalDealerState.blackjackHand)
         }
     }, [props.playerFinalTotals])
 
@@ -75,7 +87,7 @@ export const Dealer = (props: DealerProps) => {
     return (
         <div className={styles.dealer}>
             <div className={styles.name}>DEALER</div>
-            <HandOfCards blackjackHand={getCardsToDisplay()} />
+            <HandOfCards blackjackHand={dealerState.blackjackHand} />
         </div>
     )
 }

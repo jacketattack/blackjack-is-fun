@@ -48,6 +48,20 @@ test('Player won', () => {
     expect(screen.getByText('WINNER')).toBeInTheDocument()
 })
 
+test('Start new hand after player win', () => {
+    mockDealHand(CardValue.SEVEN, CardValue.TEN)
+    mockDealHand(CardValue.ACE, CardValue.TEN)
+
+    render(<App />)
+    fireEvent.click(screen.getByText('STAND'))
+
+    const newHand = screen.getByText('Next Hand')
+    fireEvent.click(newHand)
+
+    expect(screen.queryByText('WINNER')).not.toBeInTheDocument()
+    expect(newHand).not.toBeInTheDocument()
+})
+
 function mockDealHand(
     firstCardValue: CardValue,
     secondCardValue: CardValue,
