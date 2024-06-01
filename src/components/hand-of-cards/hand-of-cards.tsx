@@ -5,6 +5,7 @@ import * as styles from './hand-of-cards.module.css'
 
 interface HandOfCardsProps {
     blackjackHand: BlackjackHand
+    testId: String
     onBust?(): void
     onTotalTwentyOne?(): void
 }
@@ -31,7 +32,7 @@ export const HandOfCards = (props: HandOfCardsProps) => {
         <>
             <div className={styles.hand}>
                 {cardsToDisplay.map((card: Card, index: number) => (
-                    <span key={index}>
+                    <span key={index} data-testid={`${props.testId}-${index}`}>
                         <CardImage card={card} />
                     </span>
                 ))}
