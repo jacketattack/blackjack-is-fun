@@ -10,10 +10,11 @@ import { HandOfCards } from '../hand-of-cards/hand-of-cards'
 import { PlayerActions } from '../player-actions/player-actions'
 import { PlayerHandResult } from '../player-hand-result/player-hand-result'
 import * as styles from './player.module.css'
+import { blackjack } from '../card-total-display/card-total-display.module.css'
 
 interface PlayerProps {
     name: string
-    dealerHand: Card[]
+    dealerHand: BlackjackHand
     onHasFinishedActions(playerFinalHandsOfCards: BlackjackHand[]): void
 }
 
@@ -31,9 +32,14 @@ export const Player = (props: PlayerProps) => {
         activeHandIndex: 0,
     })
 
-    const dealerHandTotal: CardTotal = useHandOfCardsTotal(props.dealerHand)
+    const dealerHandTotal: CardTotal = useHandOfCardsTotal(
+        props.dealerHand.cards
+    )
+    // console.log(dealerHandTotal)
     useEffect(() => {
+        // console.log("pre blackman")
         if (dealerHandTotal.blackjack) {
+            // console.log("dealer blackjack")
             stand()
         }
     }, [dealerHandTotal])
@@ -140,6 +146,7 @@ export const Player = (props: PlayerProps) => {
     function finishActiveHand(
         blackjackHands: BlackjackHand[]
     ): BlackjackHand[] {
+        // console.log(blackjackHands)
         const copyOfBlackjackHands: BlackjackHand[] = [...blackjackHands]
         copyOfBlackjackHands[playerState.activeHandIndex].finished = true
 
