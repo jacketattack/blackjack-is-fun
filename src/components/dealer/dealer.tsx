@@ -38,6 +38,21 @@ export const Dealer = (props: DealerProps) => {
         }
     }, [props.playerFinalTotals])
 
+    useEffect(() => {
+        const initialTotal = calculateHandOfCardsTotal(
+            dealerState.blackjackHand.cards
+        )
+        if (initialTotal.blackjack) {
+            setDealerState({
+                blackjackHand: {
+                    ...dealerState.blackjackHand,
+                    finished: true,
+                },
+            })
+            props.onHasFinishedPlaying(dealerState.blackjackHand.cards)
+        }
+    }, [])
+
     function isDealerOpeningHand(): boolean {
         return (
             dealerState.blackjackHand.cards.length === 2 &&
