@@ -29,10 +29,10 @@ By participating, you are expected to uphold this code.
 
 This project has a variety of dependencies required to run. This section will act as a guide to setting up the environment for this project.
 
-#### Install Node.js and npm
+#### Install Node.js and pnpm
 
 1. Download and install Node.js from https://nodejs.org/.
-2. npm (Node Package Manager) is included with Node.js, so you don't need to install it separately.
+2. Install pnpm (Performant npm) globally: `npm install -g pnpm`.
 
 #### Clone Repo
 
@@ -41,8 +41,8 @@ This project has a variety of dependencies required to run. This section will ac
 
 #### Install Dependencies
 
-1. Install dependencies: `npm i`
-2. Start app: `npm run start` and navigate to `http://localhost:1234` and beat the dealer!
+1. Install dependencies: `pnpm install`
+2. Start app: `pnpm start` and navigate to `http://localhost:1234` and beat the dealer!
 
 ## How Can I Contribute?
 
