@@ -29,7 +29,7 @@ export const HandOfCards = (props: HandOfCardsProps) => {
 
     return (
         <>
-            <div className={styles.hand}>
+            <div className={styles.hand} data-testid="hand-of-cards">
                 {cardsToDisplay.map((card: Card, index: number) => (
                     <span key={index}>
                         <CardImage card={card} />

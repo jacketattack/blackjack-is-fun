@@ -9,6 +9,7 @@
     -   [Submitting an Issue](#submitting-an-issue)
     -   [Your First Contribution](#your-first-contribution)
     -   [Making a Pull Request](#making-a-pull-request)
+-   [Constitution](#constitution)
 -   [Styleguides](#styleguides)
     -   [Git Commit Messages](#git-commit-messages)
     -   [Git Branch Naming](#git-branch-naming)
@@ -66,6 +67,10 @@ There are some rules before a pull request can be reviewed:
 4. Formatting should follow the [styleguide](#pull-requests)
 
 While the style must be satisfied prior to having your pull request reviewed, the reviewer(s) may ask you to complete additional design work, tests, or other changes before your pull request can be ultimately accepted.
+
+## Constitution
+
+This project follows a set of architectural and testing patterns defined in our [CONSTITUTION.md](/CONSTITUTION.md). Please review it before contributing to ensure your code aligns with our standards.
 
 ## Styleguides
 
