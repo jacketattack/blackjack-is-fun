@@ -46,6 +46,15 @@ test('Player won', () => {
     expect(screen.getByText('WINNER')).toBeInTheDocument()
 })
 
+test('Player lost when dealer is dealt a blackjack', () => {
+    mockDealHand(CardValue.ACE, CardValue.KING) // Dealer
+    mockDealHand(CardValue.TEN, CardValue.TEN) // Player
+
+    render(<App />)
+
+    expect(screen.getByText('LOSER')).toBeInTheDocument()
+})
+
 function mockDealHand(
     firstCardValue: CardValue,
     secondCardValue: CardValue,

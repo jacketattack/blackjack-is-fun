@@ -31,12 +31,23 @@ export const Player = (props: PlayerProps) => {
         activeHandIndex: 0,
     })
 
-    const dealerHandTotal: CardTotal = useHandOfCardsTotal(props.dealerHand)
     useEffect(() => {
-        if (dealerHandTotal.blackjack) {
-            stand()
+        if (dealerTotalIsTwentyOne()) {
+            const finishedHands = finishActiveHand(playerState.blackjackHands)
+            setPlayerState((prevState) => ({
+                ...prevState,
+                blackjackHands: finishedHands,
+                activeHandIndex: finishedHands.length,
+            }))
+            props.onHasFinishedActions(finishedHands)
         }
-    }, [dealerHandTotal])
+    }, [props.dealerHand])
+
+    const dealerHandTotal: CardTotal = useHandOfCardsTotal(props.dealerHand)
+
+    function dealerTotalIsTwentyOne(): boolean {
+        return calculateHandOfCardsTotal(props.dealerHand).total === 21
+    }
 
     function hit(): void {
         const handsOfCardsWithActiveHandHit: BlackjackHand[] =
@@ -140,6 +151,9 @@ export const Player = (props: PlayerProps) => {
     function finishActiveHand(
         blackjackHands: BlackjackHand[]
     ): BlackjackHand[] {
+        if (!blackjackHands[playerState.activeHandIndex]) {
+            return blackjackHands
+        }
         const copyOfBlackjackHands: BlackjackHand[] = [...blackjackHands]
         copyOfBlackjackHands[playerState.activeHandIndex].finished = true
 
