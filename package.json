@@ -40,7 +40,8 @@
         "parcel-transformer-ts-css-modules": "^1.0.14",
         "prettier": "3.0.3",
         "process": "^0.11.10",
-        "ts-jest": "^29.0.5"
+        "ts-jest": "^29.0.5",
+        "typed-css-modules": "^0.9.1"
     },
     "dependencies": {
         "@parcel/config-default": "^2.16.4",
