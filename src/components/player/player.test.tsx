@@ -50,6 +50,38 @@ describe('Player Component', () => {
         expect(onFinished).toHaveBeenCalled()
     })
 
+    test('automatically stands when dealer has blackjack', () => {
+        const onFinished = jest.fn()
+        mockInitialDeal([
+            { value: CardValue.TEN, suit: CardSuit.CLUBS },
+            { value: CardValue.TEN, suit: CardSuit.CLUBS },
+        ])
+
+        // Dealer has Blackjack (Ace + King)
+        const dealerHand = [
+            { value: CardValue.ACE, suit: CardSuit.SPADES },
+            { value: CardValue.KING, suit: CardSuit.SPADES },
+        ]
+
+        const { rerender } = render(
+            <Player
+                name="PLAYER"
+                dealerHand={[]}
+                onHasFinishedActions={onFinished}
+            />
+        )
+
+        rerender(
+            <Player
+                name="PLAYER"
+                dealerHand={dealerHand}
+                onHasFinishedActions={onFinished}
+            />
+        )
+
+        expect(onFinished).toHaveBeenCalled()
+    })
+
     test('draws card when hitting', () => {
         mockInitialDeal([
             { value: CardValue.TEN, suit: CardSuit.CLUBS },

@@ -144,6 +144,9 @@ export const Player = (props: PlayerProps) => {
     function finishActiveHand(
         blackjackHands: BlackjackHand[]
     ): BlackjackHand[] {
+        if (!blackjackHands[playerState.activeHandIndex]) {
+            return blackjackHands
+        }
         const copyOfBlackjackHands: BlackjackHand[] = [...blackjackHands]
         copyOfBlackjackHands[playerState.activeHandIndex].finished = true
 
