@@ -8,7 +8,7 @@ A blackjack web app that I started building on a flight when I was bored :).
 
 # Demo
 
-You can try out the live demo of the blackjack game [here](https://blackjack-mpnm.onrender.com/).
+You can try out the live demo of the blackjack game [here](https://blackjack-is-fun.vercel.app/).
 
 # Usage
 
