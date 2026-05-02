@@ -4,3 +4,4 @@ node_modules/
 dist/
 plan
 parcel-bundle-reports/
+*.module.css.d.ts
