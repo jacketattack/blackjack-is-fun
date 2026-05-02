@@ -24,7 +24,11 @@ export const Dealer = (props: DealerProps) => {
         blackjackHand: dealHand(),
     })
     useEffect(() => {
-        if (hasPlayerFinishedPlaying() && !hasPlayerBusted()) {
+        if (
+            hasPlayerFinishedPlaying() &&
+            !hasPlayerBusted() &&
+            !dealerState.blackjackHand.finished
+        ) {
             const dealerFinalHand: Card[] = playDealerHand(
                 dealerState.blackjackHand.cards
             )
@@ -36,6 +40,13 @@ export const Dealer = (props: DealerProps) => {
             })
             props.onHasFinishedPlaying(dealerFinalHand)
         } else if (hasPlayerFinishedPlaying() && hasPlayerBusted()) {
+            props.onHasFinishedPlaying(dealerState.blackjackHand.cards)
+        } else if (
+            dealerTotalIsTwentyOne() &&
+            dealerState.blackjackHand.cards.length === 2 &&
+            !hasPlayerFinishedPlaying()
+        ) {
+            // Dealer has blackjack or 21 on deal, and player hasn't finished yet
             props.onHasFinishedPlaying(dealerState.blackjackHand.cards)
         }
     }, [props.playerFinalTotals])
