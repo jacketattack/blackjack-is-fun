@@ -102,6 +102,8 @@ Branches should include a label describing the type of issue followed by a slash
 
 Pull requests are a means of code review before merging the branch, so it should be descriptive. In many cases, a title is all that is neccesary. If the issue is bigger, then provide a short description of what the pull request is for.
 
+**Mandatory Testing:** All Pull Requests must include unit tests covering any new source code logic. Submitting PRs without accompanying tests is a violation of the repository's quality standards.
+
 When working on front-end issues, the pull request should include a before and after image. This will help reviewers understand what is being changed.
 
 ### Issues
