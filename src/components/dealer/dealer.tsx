@@ -29,6 +29,7 @@ export const Dealer = (props: DealerProps) => {
             !hasPlayerBusted() &&
             !dealerState.blackjackHand.finished
         ) {
+            // Dealer plays out hand if player has finished and hasn't busted
             const dealerFinalHand: Card[] = playDealerHand(
                 dealerState.blackjackHand.cards
             )
@@ -40,6 +41,7 @@ export const Dealer = (props: DealerProps) => {
             })
             props.onHasFinishedPlaying(dealerFinalHand)
         } else if (hasPlayerFinishedPlaying() && hasPlayerBusted()) {
+            // Dealer does not need to play out hand if player has busted
             props.onHasFinishedPlaying(dealerState.blackjackHand.cards)
         } else if (
             dealerTotalIsTwentyOne() &&
