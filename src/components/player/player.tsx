@@ -33,10 +33,14 @@ export const Player = (props: PlayerProps) => {
 
     const dealerHandTotal: CardTotal = useHandOfCardsTotal(props.dealerHand)
     useEffect(() => {
-        if (dealerHandTotal.blackjack) {
+        if (dealerHandTotal.blackjack || dealerTotalIsTwentyOne()) {
             stand()
         }
-    }, [dealerHandTotal])
+    }, [dealerHandTotal, props.dealerHand])
+
+    function dealerTotalIsTwentyOne(): boolean {
+        return calculateHandOfCardsTotal(props.dealerHand).total === 21
+    }
 
     function hit(): void {
         const handsOfCardsWithActiveHandHit: BlackjackHand[] =

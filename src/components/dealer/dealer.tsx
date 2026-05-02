@@ -35,6 +35,8 @@ export const Dealer = (props: DealerProps) => {
                 },
             })
             props.onHasFinishedPlaying(dealerFinalHand)
+        } else if (hasPlayerFinishedPlaying() && hasPlayerBusted()) {
+            props.onHasFinishedPlaying(dealerState.blackjackHand.cards)
         }
     }, [props.playerFinalTotals])
 
