@@ -1,4 +1,4 @@
-import sample from 'lodash/sample'
+import shuffle from 'lodash/shuffle'
 import {
     BlackjackHand,
     Card,
@@ -6,7 +6,13 @@ import {
     CardValue,
 } from '../interfaces/card.interface'
 
+const NUMBER_OF_DECKS = 6
+const PENETRATION_LIMIT = 0.75
+
+let shoe: Card[] = []
+
 export function dealHand(): BlackjackHand {
+    checkShoePenetration()
     return {
         cards: [drawCard(), drawCard()],
         finished: false,
@@ -14,10 +20,10 @@ export function dealHand(): BlackjackHand {
 }
 
 export function drawCard(): Card {
-    return {
-        value: sample(Object.values(CardValue)) as CardValue,
-        suit: sample(Object.values(CardSuit)) as CardSuit,
+    if (shoe.length === 0) {
+        buildNewShoe()
     }
+    return shoe.pop()!
 }
 
 export function drawPair(): BlackjackHand {
@@ -33,5 +39,25 @@ export function drawPair(): BlackjackHand {
             },
         ],
         finished: false,
+    }
+}
+
+function buildNewShoe(): void {
+    const newShoe: Card[] = []
+    for (let i = 0; i < NUMBER_OF_DECKS; i++) {
+        Object.values(CardSuit).forEach((suit) => {
+            Object.values(CardValue).forEach((value) => {
+                newShoe.push({ suit, value })
+            })
+        })
+    }
+    shoe = shuffle(newShoe)
+}
+
+function checkShoePenetration(): void {
+    const totalCards = NUMBER_OF_DECKS * 52
+    const usedCards = totalCards - shoe.length
+    if (shoe.length === 0 || usedCards / totalCards >= PENETRATION_LIMIT) {
+        buildNewShoe()
     }
 }
