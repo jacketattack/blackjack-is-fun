@@ -1,18 +1,16 @@
 import { Dispatch, SetStateAction, useState } from 'react'
 
-import { BlackjackHand } from '../../interfaces/card.interface'
-import { dealEmptyHand, dealHand } from '../../services/deck'
+import { BlackjackHand, Card } from '../../interfaces/card.interface'
 import calculateHandOfCardsTotal from '../../services/handOfCardsCalculation'
 import { Dealer } from '../dealer/dealer'
-import { EndGameActions } from '../end-game-actions/end-game-actions'
 import { Player } from '../player/player'
 import { Title } from '../title/title'
 import * as styles from './app.module.css'
 
 interface AppState {
     playerFinalTotals: number[]
-    dealerHand: BlackjackHand
-    handCountIndex: number
+    dealerHand: Card[]
+    gameId: number
 }
 
 export function App() {
@@ -21,8 +19,8 @@ export function App() {
         Dispatch<SetStateAction<AppState>>,
     ] = useState({
         playerFinalTotals: [],
-        dealerHand: dealEmptyHand(),
-        handCountIndex: 0,
+        dealerHand: [],
+        gameId: 0,
     })
 
     function notifyDealerToPlay(
@@ -38,41 +36,47 @@ export function App() {
         })
     }
 
-    function setDealerFinalHandOfCards(
-        dealerFinalHandOfCards: BlackjackHand
-    ): void {
+    function setDealerFinalHandOfCards(dealerFinalHandOfCards: Card[]): void {
         setAppState({
             ...appState,
             dealerHand: dealerFinalHandOfCards,
         })
     }
 
-    function nextHand(): void {
+    function startNewGame(): void {
         setAppState({
-            ...appState,
             playerFinalTotals: [],
-            dealerHand: dealEmptyHand(),
-            handCountIndex: appState.handCountIndex + 1,
+            dealerHand: [],
+            gameId: appState.gameId + 1,
         })
     }
+
+    const isGameOver = appState.dealerHand.length > 0
 
     return (
         <>
             <div className={styles.game}>
                 <Title />
                 <Dealer
-                    key={`dealer_${appState.handCountIndex}`}
+                    key={`dealer-${appState.gameId}`}
                     playerFinalTotals={appState.playerFinalTotals}
                     onHasFinishedPlaying={setDealerFinalHandOfCards}
                 />
                 <Player
-                    key={`player_${appState.handCountIndex}`}
+                    key={`player-${appState.gameId}`}
                     name="PLAYER"
                     onHasFinishedActions={notifyDealerToPlay}
                     dealerHand={appState.dealerHand}
                 />
-                {appState.dealerHand.finished && (
-                    <EndGameActions onNewHand={nextHand} />
+                {isGameOver && (
+                    <div className={styles.actions}>
+                        <button
+                            className={styles.newGameButton}
+                            onClick={startNewGame}
+                        >
+                            NEW GAME
+                        </button>
+                    </div>
                 )}
             </div>
         </>

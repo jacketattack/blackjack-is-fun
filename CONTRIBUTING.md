@@ -9,6 +9,7 @@
     -   [Submitting an Issue](#submitting-an-issue)
     -   [Your First Contribution](#your-first-contribution)
     -   [Making a Pull Request](#making-a-pull-request)
+-   [Constitution](#constitution)
 -   [Styleguides](#styleguides)
     -   [Git Commit Messages](#git-commit-messages)
     -   [Git Branch Naming](#git-branch-naming)
@@ -67,6 +68,10 @@ There are some rules before a pull request can be reviewed:
 
 While the style must be satisfied prior to having your pull request reviewed, the reviewer(s) may ask you to complete additional design work, tests, or other changes before your pull request can be ultimately accepted.
 
+## Constitution
+
+This project follows a set of architectural and testing patterns defined in our [CONSTITUTION.md](/CONSTITUTION.md). Please review it before contributing to ensure your code aligns with our standards.
+
 ## Styleguides
 
 ### Git Commit Messages
@@ -101,6 +106,8 @@ Branches should include a label describing the type of issue followed by a slash
 ### Pull Requests
 
 Pull requests are a means of code review before merging the branch, so it should be descriptive. In many cases, a title is all that is neccesary. If the issue is bigger, then provide a short description of what the pull request is for.
+
+**Mandatory Testing:** All Pull Requests must include unit tests covering any new source code logic. Submitting PRs without accompanying tests is a violation of the repository's quality standards.
 
 When working on front-end issues, the pull request should include a before and after image. This will help reviewers understand what is being changed.
 

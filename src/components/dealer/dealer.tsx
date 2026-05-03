@@ -6,11 +6,10 @@ import { dealHand } from '../../services/deck'
 import calculateHandOfCardsTotal from '../../services/handOfCardsCalculation'
 import { HandOfCards } from '../hand-of-cards/hand-of-cards'
 import * as styles from './dealer.module.css'
-import { blackjack } from '../card-total-display/card-total-display.module.css'
 
 interface DealerProps {
     playerFinalTotals: number[]
-    onHasFinishedPlaying(dealerFinalHand: BlackjackHand): void
+    onHasFinishedPlaying(dealerFinalHandOfCards: Card[]): void
 }
 
 interface DealerState {
@@ -25,29 +24,17 @@ export const Dealer = (props: DealerProps) => {
         blackjackHand: dealHand(),
     })
     useEffect(() => {
-        if (hasPlayerFinishedPlaying()) {
-            let finalDealerState: DealerState
-            if (hasPlayerBusted()) {
-                finalDealerState = {
-                    blackjackHand: {
-                        ...dealerState.blackjackHand,
-                        finished: true,
-                    },
-                }
-            } else {
-                const dealerFinalHand: Card[] = playDealerHand(
-                    dealerState.blackjackHand.cards
-                )
-
-                finalDealerState = {
-                    blackjackHand: {
-                        cards: dealerFinalHand,
-                        finished: true,
-                    },
-                }
-            }
-            setDealerState(finalDealerState)
-            props.onHasFinishedPlaying(finalDealerState.blackjackHand)
+        if (hasPlayerFinishedPlaying() && !hasPlayerBusted()) {
+            const dealerFinalHand: Card[] = playDealerHand(
+                dealerState.blackjackHand.cards
+            )
+            setDealerState({
+                blackjackHand: {
+                    cards: dealerFinalHand,
+                    finished: true,
+                },
+            })
+            props.onHasFinishedPlaying(dealerFinalHand)
         }
     }, [props.playerFinalTotals])
 
@@ -76,9 +63,6 @@ export const Dealer = (props: DealerProps) => {
     }
 
     function getCardsToDisplay(): BlackjackHand {
-        if (dealerTotalIsTwentyOne()) {
-            dealerState.blackjackHand.finished = true
-        }
         return {
             ...dealerState.blackjackHand,
             cards:
@@ -91,10 +75,7 @@ export const Dealer = (props: DealerProps) => {
     return (
         <div className={styles.dealer}>
             <div className={styles.name}>DEALER</div>
-            <HandOfCards
-                blackjackHand={getCardsToDisplay()}
-                testId="dealer-card"
-            />
+            <HandOfCards blackjackHand={getCardsToDisplay()} />
         </div>
     )
 }
