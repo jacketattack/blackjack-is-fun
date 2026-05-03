@@ -15,11 +15,16 @@ interface PlayerProps {
     name: string
     dealerHand: Card[]
     onHasFinishedActions(playerFinalHandsOfCards: BlackjackHand[]): void
+    initialBet: number
+    onBetPlaced(amount: number): void
+    onWinningsReceived(amount: number): void
+    gameStarted: boolean
 }
 
 interface PlayerState {
     blackjackHands: BlackjackHand[]
     activeHandIndex: number
+    winningsProcessed: boolean
 }
 
 export const Player = (props: PlayerProps) => {
@@ -27,9 +32,20 @@ export const Player = (props: PlayerProps) => {
         PlayerState,
         Dispatch<SetStateAction<PlayerState>>,
     ] = useState({
-        blackjackHands: [dealHand()],
+        blackjackHands: [dealHand(props.initialBet)],
         activeHandIndex: 0,
+        winningsProcessed: false,
     })
+
+    useEffect(() => {
+        if (props.gameStarted) {
+            setPlayerState({
+                blackjackHands: [dealHand(props.initialBet)],
+                activeHandIndex: 0,
+                winningsProcessed: false,
+            })
+        }
+    }, [props.gameStarted, props.initialBet])
 
     useEffect(() => {
         if (dealerTotalIsTwentyOne()) {
@@ -45,6 +61,43 @@ export const Player = (props: PlayerProps) => {
 
     const dealerHandTotal: CardTotal = useHandOfCardsTotal(props.dealerHand)
 
+    // Handle winnings
+    useEffect(() => {
+        if (
+            playerIsFinished() &&
+            props.dealerHand.length > 0 &&
+            !playerState.winningsProcessed
+        ) {
+            const dealerTotal = calculateHandOfCardsTotal(
+                props.dealerHand
+            ).total
+            let totalWinnings = 0
+
+            playerState.blackjackHands.forEach((hand) => {
+                const playerTotal = calculateHandOfCardsTotal(hand.cards).total
+                if (playerTotal <= 21) {
+                    if (dealerTotal > 21 || playerTotal > dealerTotal) {
+                        // Win
+                        totalWinnings += hand.bet * 2
+                    } else if (playerTotal === dealerTotal) {
+                        // Push
+                        totalWinnings += hand.bet
+                    }
+                }
+            })
+
+            if (totalWinnings > 0) {
+                props.onWinningsReceived(totalWinnings)
+            }
+            setPlayerState((prev) => ({ ...prev, winningsProcessed: true }))
+        }
+    }, [
+        playerState.blackjackHands,
+        playerState.activeHandIndex,
+        props.dealerHand,
+        playerState.winningsProcessed,
+    ])
+
     function dealerTotalIsTwentyOne(): boolean {
         return calculateHandOfCardsTotal(props.dealerHand).total === 21
     }
@@ -59,12 +112,17 @@ export const Player = (props: PlayerProps) => {
     }
 
     function doubleDown(): void {
+        const activeHand =
+            playerState.blackjackHands[playerState.activeHandIndex]
+        props.onBetPlaced(activeHand.bet)
+
         const handsOfCardsWithActiveHandHit: BlackjackHand[] =
-            addCardToActiveHand()
+            addCardToActiveHand(activeHand.bet * 2)
         finishActiveHand(handsOfCardsWithActiveHandHit)
 
         const newActiveHandIndex: number = getNextActiveHandIndex()
         setPlayerState({
+            ...playerState,
             blackjackHands: handsOfCardsWithActiveHandHit,
             activeHandIndex: newActiveHandIndex,
         })
@@ -75,16 +133,21 @@ export const Player = (props: PlayerProps) => {
     }
 
     function split(): void {
-        const splitCard: Card =
-            playerState.blackjackHands[playerState.activeHandIndex].cards[0]
+        const activeHand =
+            playerState.blackjackHands[playerState.activeHandIndex]
+        props.onBetPlaced(activeHand.bet)
+
+        const splitCard: Card = activeHand.cards[0]
         const splitHands: BlackjackHand[] = [
             {
                 cards: [splitCard, drawCard()],
                 finished: false,
+                bet: activeHand.bet,
             },
             {
                 cards: [splitCard, drawCard()],
                 finished: false,
+                bet: activeHand.bet,
             },
         ]
         const copyOfBlackjackHands: BlackjackHand[] = [
@@ -105,13 +168,15 @@ export const Player = (props: PlayerProps) => {
     function stand(): void {
         const newActiveHandIndex: number = getNextActiveHandIndex()
 
+        const finishedHands = finishActiveHand(playerState.blackjackHands)
         setPlayerState({
-            blackjackHands: finishActiveHand(playerState.blackjackHands),
+            ...playerState,
+            blackjackHands: finishedHands,
             activeHandIndex: newActiveHandIndex,
         })
 
         if (playerIsFinished(newActiveHandIndex)) {
-            props.onHasFinishedActions(playerState.blackjackHands)
+            props.onHasFinishedActions(finishedHands)
         }
     }
 
@@ -134,14 +199,13 @@ export const Player = (props: PlayerProps) => {
         return playerState.blackjackHands.length
     }
 
-    function addCardToActiveHand(): BlackjackHand[] {
+    function addCardToActiveHand(newBet?: number): BlackjackHand[] {
+        const activeHand =
+            playerState.blackjackHands[playerState.activeHandIndex]
         const handWithNewCardAdded: BlackjackHand = {
-            ...playerState.blackjackHands[playerState.activeHandIndex],
-            cards: [
-                ...playerState.blackjackHands[playerState.activeHandIndex]
-                    .cards,
-                drawCard(),
-            ],
+            ...activeHand,
+            cards: [...activeHand.cards, drawCard()],
+            bet: newBet !== undefined ? newBet : activeHand.bet,
         }
         const copyOfHandsOfCards = [...playerState.blackjackHands]
         copyOfHandsOfCards[playerState.activeHandIndex] = handWithNewCardAdded
@@ -194,6 +258,7 @@ export const Player = (props: PlayerProps) => {
                                             playerState.activeHandIndex
                                         ].cards
                                     }
+                                    bet={hand.bet}
                                     onHit={hit}
                                     onDoubleDown={doubleDown}
                                     onSplit={split}

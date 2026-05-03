@@ -8,11 +8,12 @@ import { CardSuit, CardValue } from '../../interfaces/card.interface'
 describe('Player Component', () => {
     afterEach(cleanup)
 
-    function mockInitialDeal(cards: any[]) {
-        jest.spyOn(deck, 'dealHand').mockReturnValue({
+    function mockInitialDeal(cards: any[], bet: number = 10) {
+        return jest.spyOn(deck, 'dealHand').mockImplementation(() => ({
             cards: cards,
             finished: false,
-        })
+            bet: bet,
+        }))
     }
 
     test('renders player name', () => {
@@ -25,6 +26,10 @@ describe('Player Component', () => {
                 name="TEST PLAYER"
                 dealerHand={[]}
                 onHasFinishedActions={jest.fn()}
+                initialBet={10}
+                onBetPlaced={jest.fn()}
+                onWinningsReceived={jest.fn()}
+                gameStarted={false}
             />
         )
         expect(screen.getByText('TEST PLAYER')).toBeInTheDocument()
@@ -42,6 +47,10 @@ describe('Player Component', () => {
                 name="PLAYER"
                 dealerHand={[]}
                 onHasFinishedActions={onFinished}
+                initialBet={10}
+                onBetPlaced={jest.fn()}
+                onWinningsReceived={jest.fn()}
+                gameStarted={false}
             />
         )
 
@@ -68,6 +77,10 @@ describe('Player Component', () => {
                 name="PLAYER"
                 dealerHand={[]}
                 onHasFinishedActions={onFinished}
+                initialBet={10}
+                onBetPlaced={jest.fn()}
+                onWinningsReceived={jest.fn()}
+                gameStarted={false}
             />
         )
 
@@ -76,6 +89,10 @@ describe('Player Component', () => {
                 name="PLAYER"
                 dealerHand={dealerHand}
                 onHasFinishedActions={onFinished}
+                initialBet={10}
+                onBetPlaced={jest.fn()}
+                onWinningsReceived={jest.fn()}
+                gameStarted={false}
             />
         )
 
@@ -97,6 +114,10 @@ describe('Player Component', () => {
                 name="PLAYER"
                 dealerHand={[]}
                 onHasFinishedActions={jest.fn()}
+                initialBet={10}
+                onBetPlaced={jest.fn()}
+                onWinningsReceived={jest.fn()}
+                gameStarted={false}
             />
         )
 
@@ -128,6 +149,10 @@ describe('Player Component', () => {
                 name="PLAYER"
                 dealerHand={[]}
                 onHasFinishedActions={jest.fn()}
+                initialBet={10}
+                onBetPlaced={jest.fn()}
+                onWinningsReceived={jest.fn()}
+                gameStarted={false}
             />
         )
 

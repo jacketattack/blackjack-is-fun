@@ -27,4 +27,11 @@
 .actionButtons {
     margin-top: 30px;
     display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.betDisplay {
+    margin-right: 15px;
+    font-size: large;
 }

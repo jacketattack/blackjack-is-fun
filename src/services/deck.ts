@@ -11,11 +11,12 @@ const PENETRATION_LIMIT = 0.75
 
 let shoe: Card[] = []
 
-export function dealHand(): BlackjackHand {
+export function dealHand(bet: number = 0): BlackjackHand {
     checkShoePenetration()
     return {
         cards: [drawCard(), drawCard()],
         finished: false,
+        bet: bet,
     }
 }
 
@@ -39,6 +40,7 @@ export function drawPair(): BlackjackHand {
             },
         ],
         finished: false,
+        bet: 0,
     }
 }
 

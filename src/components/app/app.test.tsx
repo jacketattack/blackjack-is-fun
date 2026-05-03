@@ -17,6 +17,7 @@ test('Player and dealer totals are displayed after finishing game', async () => 
     mockDealHand(CardValue.SEVEN, CardValue.SEVEN)
 
     render(<App />)
+    fireEvent.click(screen.getByText('New Game'))
 
     fireEvent.click(screen.getByText('STAND'))
 
@@ -29,6 +30,7 @@ test('Player is dealt two kings', () => {
     mockDealHand(CardValue.KING, CardValue.KING)
 
     render(<App />)
+    fireEvent.click(screen.getByText('New Game'))
 
     fireEvent.click(screen.getByText('SPLIT'))
 
@@ -40,6 +42,7 @@ test('Player won', () => {
     mockDealHand(CardValue.ACE, CardValue.TEN)
 
     render(<App />)
+    fireEvent.click(screen.getByText('New Game'))
 
     fireEvent.click(screen.getByText('STAND'))
 
@@ -51,6 +54,7 @@ test('Player lost when dealer is dealt a blackjack', () => {
     mockDealHand(CardValue.TEN, CardValue.TEN) // Player
 
     render(<App />)
+    fireEvent.click(screen.getByText('New Game'))
 
     expect(screen.getByText('LOSER')).toBeInTheDocument()
 })
@@ -62,7 +66,7 @@ function mockDealHand(
     firstCardSuit: CardSuit = CardSuit.CLUBS,
     secondCardSuit: CardSuit = CardSuit.DIAMONDS
 ) {
-    jest.spyOn(deck, 'dealHand').mockReturnValueOnce({
+    return jest.spyOn(deck, 'dealHand').mockImplementation(() => ({
         cards: [
             {
                 value: firstCardValue,
@@ -74,5 +78,6 @@ function mockDealHand(
             },
         ],
         finished: finished,
-    })
+        bet: 10,
+    }))
 }
