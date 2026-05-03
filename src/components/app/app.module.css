@@ -1,7 +1,49 @@
 .game {
-    margin-left: 42%;
+    min-height: 100vh;
+    background-color: #2e7d32; /* Green felt color */
+    background-image: radial-gradient(
+        circle at center,
+        #388e3c 0%,
+        #1b5e20 100%
+    );
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: white;
+    font-family: 'Arial', sans-serif;
+    position: relative;
+    padding: 20px;
+    box-sizing: border-box;
 }
 
-.player {
-    margin-top: 25px;
+.tableMarkings {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-radius: 50% / 20%;
+    padding: 40px 80px;
+    margin: 40px 0;
+    text-transform: uppercase;
+    font-weight: bold;
+    color: rgba(255, 255, 255, 0.6);
+    text-align: center;
+}
+
+.tableMarkings div {
+    margin: 5px 0;
+}
+
+.blackjackPays {
+    font-size: 1.5rem;
+    color: #ffd700; /* Gold color for emphasis */
+}
+
+.dealerRules {
+    font-size: 1rem;
+}
+
+.insurancePays {
+    font-size: 1rem;
 }
