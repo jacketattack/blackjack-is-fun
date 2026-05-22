@@ -1,3 +1,18 @@
 .hand {
     display: flex;
+    position: relative;
+}
+
+.betDisplay {
+    position: absolute;
+    bottom: -25px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 14px;
+    font-weight: 600;
+    color: #4a9eff;
+    background-color: rgba(255, 255, 255, 0.9);
+    padding: 4px 12px;
+    border-radius: 4px;
+    white-space: nowrap;
 }

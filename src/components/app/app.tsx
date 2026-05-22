@@ -1,7 +1,9 @@
 import { Dispatch, SetStateAction, useState } from 'react'
 
 import { BlackjackHand, Card } from '../../interfaces/card.interface'
+import { BettingState } from '../../interfaces/betting.interface'
 import calculateHandOfCardsTotal from '../../services/handOfCardsCalculation'
+import { initializeBettingState } from '../../services/betting'
 import { Dealer } from '../dealer/dealer'
 import { Player } from '../player/player'
 import { Title } from '../title/title'
@@ -10,6 +12,7 @@ import * as styles from './app.module.css'
 interface AppState {
     playerFinalTotals: number[]
     dealerHand: Card[]
+    bettingState: BettingState
 }
 
 export function App() {
@@ -19,6 +22,7 @@ export function App() {
     ] = useState({
         playerFinalTotals: [],
         dealerHand: [],
+        bettingState: initializeBettingState(),
     })
 
     function notifyDealerToPlay(
@@ -48,6 +52,15 @@ export function App() {
                 playerFinalTotals={appState.playerFinalTotals}
                 onHasFinishedPlaying={setDealerFinalHandOfCards}
             />
+            <Player
+                name="PLAYER"
+                onHasFinishedActions={notifyDealerToPlay}
+                dealerHand={appState.dealerHand}
+                bettingState={appState.bettingState}
+                onBettingStateChange={(bettingState) =>
+                    setAppState({ ...appState, bettingState })
+                }
+            />
 
             <div className={styles.tableMarkings}>
                 <div className={styles.blackjackPays}>
@@ -60,12 +73,6 @@ export function App() {
                     INSURANCE PAYS 2 TO 1
                 </div>
             </div>
-
-            <Player
-                name="PLAYER"
-                onHasFinishedActions={notifyDealerToPlay}
-                dealerHand={appState.dealerHand}
-            />
         </div>
     )
 }

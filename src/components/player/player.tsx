@@ -2,10 +2,18 @@ import { Dispatch, SetStateAction, useEffect, useState } from 'react'
 import useHandOfCardsTotal from '../../hooks/useHandOfCardsTotal'
 
 import { BlackjackHand, Card } from '../../interfaces/card.interface'
+import { BettingState } from '../../interfaces/betting.interface'
 import { dealHand, drawCard } from '../../services/deck'
 import calculateHandOfCardsTotal, {
     CardTotal,
 } from '../../services/handOfCardsCalculation'
+import {
+    placeBet,
+    canDoubleDown as canDoubleDownBet,
+    canSplit as canSplitBet,
+    doubleDownBet,
+    splitBet,
+} from '../../services/betting'
 import { HandOfCards } from '../hand-of-cards/hand-of-cards'
 import { PlayerActions } from '../player-actions/player-actions'
 import { PlayerHandResult } from '../player-hand-result/player-hand-result'
@@ -14,7 +22,9 @@ import * as styles from './player.module.css'
 interface PlayerProps {
     name: string
     dealerHand: Card[]
+    bettingState: BettingState
     onHasFinishedActions(playerFinalHandsOfCards: BlackjackHand[]): void
+    onBettingStateChange(bettingState: BettingState): void
 }
 
 interface PlayerState {
@@ -26,13 +36,26 @@ export const Player = (props: PlayerProps) => {
     let [playerState, setPlayerState]: [
         PlayerState,
         Dispatch<SetStateAction<PlayerState>>,
-    ] = useState({
-        blackjackHands: [dealHand()],
+    ] = useState<PlayerState>({
+        blackjackHands: [],
         activeHandIndex: 0,
     })
 
+    let [initialized, setInitialized]: [
+        boolean,
+        Dispatch<SetStateAction<boolean>>,
+    ] = useState(false)
+
+    // Initialize game on first render
     useEffect(() => {
-        if (dealerTotalIsTwentyOne()) {
+        if (!initialized) {
+            startNewGame()
+            setInitialized(true)
+        }
+    }, [initialized])
+
+    useEffect(() => {
+        if (dealerTotalIsTwentyOne() && playerState.blackjackHands.length > 0) {
             const finishedHands = finishActiveHand(playerState.blackjackHands)
             setPlayerState((prevState) => ({
                 ...prevState,
@@ -41,12 +64,33 @@ export const Player = (props: PlayerProps) => {
             }))
             props.onHasFinishedActions(finishedHands)
         }
-    }, [props.dealerHand])
+    }, [props.dealerHand, playerState.blackjackHands.length])
 
     const dealerHandTotal: CardTotal = useHandOfCardsTotal(props.dealerHand)
 
     function dealerTotalIsTwentyOne(): boolean {
         return calculateHandOfCardsTotal(props.dealerHand).total === 21
+    }
+
+    function startNewGame(): void {
+        const updatedBettingState = placeBet(props.bettingState)
+        if (updatedBettingState.currentBet === 0) {
+            // Insufficient funds, don't start game
+            setPlayerState({
+                blackjackHands: [],
+                activeHandIndex: 0,
+            })
+            return
+        }
+
+        const newHand = dealHand()
+        newHand.bet = updatedBettingState.currentBet
+
+        props.onBettingStateChange(updatedBettingState)
+        setPlayerState({
+            blackjackHands: [newHand],
+            activeHandIndex: 0,
+        })
     }
 
     function hit(): void {
@@ -59,9 +103,21 @@ export const Player = (props: PlayerProps) => {
     }
 
     function doubleDown(): void {
+        // Check if player has sufficient bankroll
+        if (!canDoubleDownBet(props.bettingState)) {
+            return
+        }
+
+        const updatedBettingState = doubleDownBet(props.bettingState)
+        props.onBettingStateChange(updatedBettingState)
+
         const handsOfCardsWithActiveHandHit: BlackjackHand[] =
             addCardToActiveHand()
         finishActiveHand(handsOfCardsWithActiveHandHit)
+
+        // Update the bet on the active hand
+        handsOfCardsWithActiveHandHit[playerState.activeHandIndex].bet =
+            updatedBettingState.currentBet
 
         const newActiveHandIndex: number = getNextActiveHandIndex()
         setPlayerState({
@@ -75,16 +131,30 @@ export const Player = (props: PlayerProps) => {
     }
 
     function split(): void {
+        // Check if player has sufficient bankroll
+        if (!canSplitBet(props.bettingState)) {
+            return
+        }
+
+        const updatedBettingState = splitBet(props.bettingState)
+        props.onBettingStateChange(updatedBettingState)
+
         const splitCard: Card =
             playerState.blackjackHands[playerState.activeHandIndex].cards[0]
+        const currentBet =
+            playerState.blackjackHands[playerState.activeHandIndex].bet ||
+            props.bettingState.betAmount
+
         const splitHands: BlackjackHand[] = [
             {
                 cards: [splitCard, drawCard()],
                 finished: false,
+                bet: currentBet,
             },
             {
                 cards: [splitCard, drawCard()],
                 finished: false,
+                bet: currentBet,
             },
         ]
         const copyOfBlackjackHands: BlackjackHand[] = [
@@ -166,43 +236,83 @@ export const Player = (props: PlayerProps) => {
         return updatedHandIndex
     }
 
+    // Render new game button if no game is active
+    const hasActiveGame = playerState.blackjackHands.length > 0
+    const canStartNewGameBtn =
+        props.bettingState.bankroll >= props.bettingState.betAmount
+
     return (
         <div className={styles.player}>
             <div className={styles.name}>{props.name}</div>
-            <div className={styles.hands}>
-                {playerState.blackjackHands.map(
-                    (hand: BlackjackHand, index: number) => (
-                        <div className={styles.hand} key={index}>
-                            <HandOfCards
-                                blackjackHand={hand}
-                                onBust={handleNoMoreCardsAllowed}
-                                onTotalTwentyOne={handleNoMoreCardsAllowed}
-                            />
-                            {playerIsFinished() && (
-                                <PlayerHandResult
-                                    dealerFinalTotal={dealerHandTotal.total}
-                                    playerFinalTotal={
-                                        calculateHandOfCardsTotal(hand.cards)
-                                            .total
-                                    }
-                                />
-                            )}
-                            {playerState.activeHandIndex === index && (
-                                <PlayerActions
-                                    handOfCards={
-                                        playerState.blackjackHands[
-                                            playerState.activeHandIndex
-                                        ].cards
-                                    }
-                                    onHit={hit}
-                                    onDoubleDown={doubleDown}
-                                    onSplit={split}
-                                    onStand={stand}
-                                />
-                            )}
+            {!hasActiveGame && (
+                <div className={styles.newGameContainer}>
+                    {!canStartNewGameBtn ? (
+                        <div className={styles.noFundsMessage}>
+                            Game Over - Insufficient Bankroll
                         </div>
-                    )
-                )}
+                    ) : (
+                        <button
+                            className={styles.newGameButton}
+                            onClick={startNewGame}
+                        >
+                            New Game (Bet: ${props.bettingState.betAmount})
+                        </button>
+                    )}
+                </div>
+            )}
+            {hasActiveGame && (
+                <div className={styles.betInfo}>
+                    <div className={styles.currentBet}>
+                        Bet: ${props.bettingState.currentBet}
+                    </div>
+                </div>
+            )}
+            {playerState.blackjackHands.length > 0 && (
+                <div className={styles.hands}>
+                    {playerState.blackjackHands.map(
+                        (hand: BlackjackHand, index: number) => (
+                            <div className={styles.hand} key={index}>
+                                <HandOfCards
+                                    blackjackHand={hand}
+                                    onBust={handleNoMoreCardsAllowed}
+                                    onTotalTwentyOne={handleNoMoreCardsAllowed}
+                                />
+                                {playerIsFinished() && (
+                                    <PlayerHandResult
+                                        dealerFinalTotal={dealerHandTotal.total}
+                                        playerFinalTotal={
+                                            calculateHandOfCardsTotal(
+                                                hand.cards
+                                            ).total
+                                        }
+                                    />
+                                )}
+                                {playerState.activeHandIndex === index && (
+                                    <PlayerActions
+                                        handOfCards={
+                                            playerState.blackjackHands[
+                                                playerState.activeHandIndex
+                                            ].cards
+                                        }
+                                        onHit={hit}
+                                        onDoubleDown={doubleDown}
+                                        onSplit={split}
+                                        onStand={stand}
+                                        canDoubleDown={canDoubleDownBet(
+                                            props.bettingState
+                                        )}
+                                        canSplit={canSplitBet(
+                                            props.bettingState
+                                        )}
+                                    />
+                                )}
+                            </div>
+                        )
+                    )}
+                </div>
+            )}
+            <div className={styles.bankrollDisplay}>
+                Bankroll: ${props.bettingState.bankroll}
             </div>
         </div>
     )

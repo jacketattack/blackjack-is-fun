@@ -4,6 +4,7 @@ import { Player } from './player'
 import React from 'react'
 import * as deck from '../../services/deck'
 import { CardSuit, CardValue } from '../../interfaces/card.interface'
+import { initializeBettingState } from '../../services/betting'
 
 describe('Player Component', () => {
     afterEach(cleanup)
@@ -25,6 +26,8 @@ describe('Player Component', () => {
                 name="TEST PLAYER"
                 dealerHand={[]}
                 onHasFinishedActions={jest.fn()}
+                bettingState={initializeBettingState()}
+                onBettingStateChange={jest.fn()}
             />
         )
         expect(screen.getByText('TEST PLAYER')).toBeInTheDocument()
@@ -42,6 +45,8 @@ describe('Player Component', () => {
                 name="PLAYER"
                 dealerHand={[]}
                 onHasFinishedActions={onFinished}
+                bettingState={initializeBettingState()}
+                onBettingStateChange={jest.fn()}
             />
         )
 
@@ -68,6 +73,8 @@ describe('Player Component', () => {
                 name="PLAYER"
                 dealerHand={[]}
                 onHasFinishedActions={onFinished}
+                bettingState={initializeBettingState()}
+                onBettingStateChange={jest.fn()}
             />
         )
 
@@ -76,6 +83,8 @@ describe('Player Component', () => {
                 name="PLAYER"
                 dealerHand={dealerHand}
                 onHasFinishedActions={onFinished}
+                bettingState={initializeBettingState(90, 10)}
+                onBettingStateChange={jest.fn()}
             />
         )
 
@@ -97,6 +106,8 @@ describe('Player Component', () => {
                 name="PLAYER"
                 dealerHand={[]}
                 onHasFinishedActions={jest.fn()}
+                bettingState={initializeBettingState()}
+                onBettingStateChange={jest.fn()}
             />
         )
 
@@ -128,6 +139,8 @@ describe('Player Component', () => {
                 name="PLAYER"
                 dealerHand={[]}
                 onHasFinishedActions={jest.fn()}
+                bettingState={initializeBettingState()}
+                onBettingStateChange={jest.fn()}
             />
         )
 
