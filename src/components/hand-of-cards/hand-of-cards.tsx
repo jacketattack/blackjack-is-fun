@@ -40,6 +40,11 @@ export const HandOfCards = (props: HandOfCardsProps) => {
                     onBust={props.onBust}
                     onTotalTwentyOne={props.onTotalTwentyOne}
                 />
+                {props.blackjackHand.bet !== undefined && (
+                    <div className={styles.betDisplay}>
+                        Bet: ${props.blackjackHand.bet}
+                    </div>
+                )}
             </div>
         </>
     )

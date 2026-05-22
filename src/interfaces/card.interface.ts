@@ -1,6 +1,7 @@
 export interface BlackjackHand {
     cards: Card[]
     finished: boolean
+    bet?: number
 }
 
 export interface Card {
