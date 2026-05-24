@@ -42,19 +42,30 @@ export function App() {
     }
 
     return (
-        <>
-            <div className={styles.game}>
-                <Title />
-                <Dealer
-                    playerFinalTotals={appState.playerFinalTotals}
-                    onHasFinishedPlaying={setDealerFinalHandOfCards}
-                />
-                <Player
-                    name="PLAYER"
-                    onHasFinishedActions={notifyDealerToPlay}
-                    dealerHand={appState.dealerHand}
-                />
+        <div className={styles.game}>
+            <Title />
+            <Dealer
+                playerFinalTotals={appState.playerFinalTotals}
+                onHasFinishedPlaying={setDealerFinalHandOfCards}
+            />
+
+            <div className={styles.tableMarkings}>
+                <div className={styles.blackjackPays}>
+                    BLACKJACK PAYS 3 TO 2
+                </div>
+                <div className={styles.dealerRules}>
+                    DEALER MUST HIT ON 16 AND STAND ON ALL 17s
+                </div>
+                <div className={styles.insurancePays}>
+                    INSURANCE PAYS 2 TO 1
+                </div>
             </div>
-        </>
+
+            <Player
+                name="PLAYER"
+                onHasFinishedActions={notifyDealerToPlay}
+                dealerHand={appState.dealerHand}
+            />
+        </div>
     )
 }
