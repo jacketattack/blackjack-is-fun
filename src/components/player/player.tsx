@@ -244,7 +244,11 @@ export const Player = (props: PlayerProps) => {
             const winnings = calculateWinnings(dealerHandTotal.total)
             props.onBankrollUpdate(winnings)
         }
-    }, [props.dealerHand, playerIsFinished()])
+    }, [
+        props.dealerHand,
+        playerState.activeHandIndex,
+        playerState.blackjackHands.length,
+    ])
 
     function playerIsFinished(
         activeHandIndex: number = playerState.activeHandIndex
