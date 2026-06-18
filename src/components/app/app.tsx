@@ -35,6 +35,7 @@ export function App() {
         setAppState({
             ...appState,
             playerFinalTotals,
+            dealerHand: [], // Reset dealer hand when player starts new actions
         })
     }
 

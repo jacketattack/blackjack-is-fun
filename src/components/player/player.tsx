@@ -93,6 +93,7 @@ export const Player = (props: PlayerProps) => {
                 blackjackHands: [],
                 activeHandIndex: 0,
             })
+            props.onHasFinishedActions([]) // Reset dealer
             return
         }
 
