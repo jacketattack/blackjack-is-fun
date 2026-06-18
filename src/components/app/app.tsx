@@ -35,16 +35,14 @@ export function App() {
         setAppState({
             ...appState,
             playerFinalTotals,
-            dealerHand: [], // Reset dealer hand when player starts new actions
+            // Don't reset dealerHand here—it will be managed by the Dealer component
         })
     }
 
     // Reset dealer hand when starting a new game
     function resetDealerHand(): void {
-        setAppState({
-            ...appState,
-            dealerHand: [],
-        })
+        // Don't clear dealerHand here—let the Dealer component handle the initial deal
+        // The dealer's initial hand will be set when the player starts a new game
     }
 
     function setDealerFinalHandOfCards(dealerFinalHandOfCards: Card[]): void {

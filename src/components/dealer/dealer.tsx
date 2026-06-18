@@ -18,14 +18,21 @@ export const Dealer = (props: DealerProps) => {
         { blackjackHand: BlackjackHand },
         Dispatch<SetStateAction<{ blackjackHand: BlackjackHand }>>,
     ] = useState({
-        blackjackHand: { cards: props.dealerHand, finished: false },
+        blackjackHand: dealHand(), // Deal initial hand
     })
 
-    // Reset dealer hand when props.dealerHand changes
+    // Reset dealer hand when props.dealerHand changes (e.g., new game)
     useEffect(() => {
-        setDealerState({
-            blackjackHand: { cards: props.dealerHand || [], finished: false },
-        })
+        if (props.dealerHand && props.dealerHand.length > 0) {
+            setDealerState({
+                blackjackHand: { cards: props.dealerHand, finished: false },
+            })
+        } else {
+            // If dealerHand is empty, deal a new hand (start of game)
+            setDealerState({
+                blackjackHand: dealHand(),
+            })
+        }
     }, [props.dealerHand])
     useEffect(() => {
         if (

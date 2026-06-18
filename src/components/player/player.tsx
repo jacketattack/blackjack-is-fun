@@ -107,6 +107,8 @@ export const Player = (props: PlayerProps) => {
             blackjackHands: [newHand],
             activeHandIndex: 0,
         })
+
+        // Don't reset dealer hand here—let the Dealer component handle the initial deal
     }
 
     function resetGame(): void {
