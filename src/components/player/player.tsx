@@ -25,6 +25,7 @@ interface PlayerProps {
     bettingState: BettingState
     onHasFinishedActions(playerFinalHandsOfCards: BlackjackHand[]): void
     onBettingStateChange(bettingState: BettingState): void
+    onBankrollUpdate: (winnings: number) => void
 }
 
 interface PlayerState {
@@ -45,6 +46,9 @@ export const Player = (props: PlayerProps) => {
         boolean,
         Dispatch<SetStateAction<boolean>>,
     ] = useState(false)
+
+    let [betInput, setBetInput]: [number, Dispatch<SetStateAction<number>>] =
+        useState(props.bettingState.betAmount)
 
     // Initialize game on first render
     useEffect(() => {
@@ -72,9 +76,18 @@ export const Player = (props: PlayerProps) => {
         return calculateHandOfCardsTotal(props.dealerHand).total === 21
     }
 
+    function setBet(): void {
+        const bet = Math.min(betInput, props.bettingState.bankroll)
+        if (bet <= 0) return
+
+        props.onBettingStateChange({
+            ...props.bettingState,
+            betAmount: bet,
+        })
+    }
+
     function startNewGame(): void {
-        const updatedBettingState = placeBet(props.bettingState)
-        if (updatedBettingState.currentBet === 0) {
+        if (props.bettingState.bankroll < props.bettingState.betAmount) {
             // Insufficient funds, don't start game
             setPlayerState({
                 blackjackHands: [],
@@ -83,12 +96,20 @@ export const Player = (props: PlayerProps) => {
             return
         }
 
+        const updatedBettingState = placeBet(props.bettingState)
         const newHand = dealHand()
         newHand.bet = updatedBettingState.currentBet
 
         props.onBettingStateChange(updatedBettingState)
         setPlayerState({
             blackjackHands: [newHand],
+            activeHandIndex: 0,
+        })
+    }
+
+    function resetGame(): void {
+        setPlayerState({
+            blackjackHands: [],
             activeHandIndex: 0,
         })
     }
@@ -172,6 +193,25 @@ export const Player = (props: PlayerProps) => {
         })
     }
 
+    function calculateWinnings(dealerTotal: number): number {
+        let winnings = 0
+        playerState.blackjackHands.forEach((hand) => {
+            const playerTotal = calculateHandOfCardsTotal(hand.cards).total
+            const bet = hand.bet || 0
+
+            if (playerTotal > 21) {
+                winnings -= bet // Player loses bet
+            } else if (dealerTotal > 21 || playerTotal > dealerTotal) {
+                winnings += bet // Player wins bet
+            } else if (playerTotal === dealerTotal) {
+                winnings += 0 // Push, no change
+            } else {
+                winnings -= bet // Player loses bet
+            }
+        })
+        return winnings
+    }
+
     function stand(): void {
         const newActiveHandIndex: number = getNextActiveHandIndex()
 
@@ -193,6 +233,18 @@ export const Player = (props: PlayerProps) => {
             stand()
         }
     }
+
+    // Handle dealer's final hand and update bankroll
+    useEffect(() => {
+        if (
+            playerIsFinished() &&
+            props.dealerHand.length > 0 &&
+            dealerHandTotal.total > 0
+        ) {
+            const winnings = calculateWinnings(dealerHandTotal.total)
+            props.onBankrollUpdate(winnings)
+        }
+    }, [props.dealerHand, playerIsFinished()])
 
     function playerIsFinished(
         activeHandIndex: number = playerState.activeHandIndex
@@ -246,6 +298,24 @@ export const Player = (props: PlayerProps) => {
             <div className={styles.name}>{props.name}</div>
             {!hasActiveGame && (
                 <div className={styles.newGameContainer}>
+                    <div className={styles.betInputContainer}>
+                        <input
+                            type="number"
+                            className={styles.betInput}
+                            value={betInput}
+                            onChange={(e) =>
+                                setBetInput(Number(e.target.value))
+                            }
+                            min="1"
+                            max={props.bettingState.bankroll}
+                        />
+                        <button
+                            className={styles.setBetButton}
+                            onClick={setBet}
+                        >
+                            Set Bet
+                        </button>
+                    </div>
                     {!canStartNewGameBtn ? (
                         <div className={styles.noFundsMessage}>
                             Game Over - Insufficient Bankroll
@@ -255,7 +325,7 @@ export const Player = (props: PlayerProps) => {
                             className={styles.newGameButton}
                             onClick={startNewGame}
                         >
-                            New Game (Bet: ${props.bettingState.betAmount})
+                            Start Game (Bet: ${props.bettingState.betAmount})
                         </button>
                     )}
                 </div>
@@ -263,8 +333,14 @@ export const Player = (props: PlayerProps) => {
             {hasActiveGame && (
                 <div className={styles.betInfo}>
                     <div className={styles.currentBet}>
-                        Bet: ${props.bettingState.currentBet}
+                        Current Bet: ${props.bettingState.currentBet}
                     </div>
+                    <button
+                        className={styles.newGameButton}
+                        onClick={resetGame}
+                    >
+                        New Game
+                    </button>
                 </div>
             )}
             {playerState.blackjackHands.length > 0 && (

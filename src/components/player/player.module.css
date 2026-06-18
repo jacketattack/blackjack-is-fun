@@ -37,6 +37,43 @@
     text-align: center;
 }
 
+.betInputContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.betInput {
+    padding: 8px 12px;
+    font-size: 16px;
+    border: 2px solid #4a9eff;
+    border-radius: 5px;
+    width: 80px;
+    text-align: center;
+}
+
+.setBetButton {
+    padding: 8px 15px;
+    font-size: 14px;
+    font-weight: bold;
+    background-color: #4a9eff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.setBetButton:hover {
+    background-color: #357abd;
+}
+
+.setBetButton:active {
+    transform: scale(0.98);
+}
+
 .newGameButton {
     padding: 10px 30px;
     font-size: 16px;

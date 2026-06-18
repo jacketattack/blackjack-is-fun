@@ -60,6 +60,7 @@ export function App() {
                 onBettingStateChange={(bettingState) =>
                     setAppState({ ...appState, bettingState })
                 }
+                onBankrollUpdate={updateBankroll}
             />
 
             <div className={styles.tableMarkings}>
