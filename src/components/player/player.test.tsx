@@ -75,6 +75,7 @@ describe('Player Component', () => {
                 onHasFinishedActions={onFinished}
                 bettingState={initializeBettingState()}
                 onBettingStateChange={jest.fn()}
+                onBankrollUpdate={jest.fn()}
             />
         )
 
@@ -85,6 +86,7 @@ describe('Player Component', () => {
                 onHasFinishedActions={onFinished}
                 bettingState={initializeBettingState(90, 10)}
                 onBettingStateChange={jest.fn()}
+                onBankrollUpdate={jest.fn()}
             />
         )
 

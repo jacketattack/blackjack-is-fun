@@ -26,6 +26,7 @@ interface PlayerProps {
     onHasFinishedActions(playerFinalHandsOfCards: BlackjackHand[]): void
     onBettingStateChange(bettingState: BettingState): void
     onBankrollUpdate: (winnings: number) => void
+    onResetDealerHand?: () => void
 }
 
 interface PlayerState {
@@ -113,6 +114,10 @@ export const Player = (props: PlayerProps) => {
             blackjackHands: [],
             activeHandIndex: 0,
         })
+        props.onHasFinishedActions([]) // Reset dealer
+        if (props.onResetDealerHand) {
+            props.onResetDealerHand()
+        }
     }
 
     function hit(): void {

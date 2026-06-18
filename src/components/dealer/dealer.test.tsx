@@ -30,7 +30,14 @@ describe('Dealer Component', () => {
         ])
 
         render(
-            <Dealer playerFinalTotals={[]} onHasFinishedPlaying={jest.fn()} />
+            <Dealer
+                playerFinalTotals={[]}
+                dealerHand={[
+                    { value: CardValue.TEN, suit: CardSuit.CLUBS },
+                    { value: CardValue.FIVE, suit: CardSuit.DIAMONDS },
+                ]}
+                onHasFinishedPlaying={jest.fn()}
+            />
         )
 
         // Should only show one card (Total: 10) initially
@@ -52,7 +59,11 @@ describe('Dealer Component', () => {
         jest.spyOn(dealerStrategy, 'playDealerHand').mockReturnValue(finalCards)
 
         const { rerender } = render(
-            <Dealer playerFinalTotals={[]} onHasFinishedPlaying={onFinished} />
+            <Dealer
+                playerFinalTotals={[]}
+                dealerHand={initialCards}
+                onHasFinishedPlaying={onFinished}
+            />
         )
 
         // Simulate player finishing with a total of 18
@@ -79,7 +90,14 @@ describe('Dealer Component', () => {
             .mockReturnValue([])
 
         const { rerender } = render(
-            <Dealer playerFinalTotals={[]} onHasFinishedPlaying={onFinished} />
+            <Dealer
+                playerFinalTotals={[]}
+                dealerHand={[
+                    { value: CardValue.TEN, suit: CardSuit.CLUBS },
+                    { value: CardValue.SIX, suit: CardSuit.DIAMONDS },
+                ]}
+                onHasFinishedPlaying={onFinished}
+            />
         )
 
         playSpy.mockClear()

@@ -39,6 +39,14 @@ export function App() {
         })
     }
 
+    // Reset dealer hand when starting a new game
+    function resetDealerHand(): void {
+        setAppState({
+            ...appState,
+            dealerHand: [],
+        })
+    }
+
     function setDealerFinalHandOfCards(dealerFinalHandOfCards: Card[]): void {
         setAppState({
             ...appState,
@@ -62,6 +70,7 @@ export function App() {
             <Title />
             <Dealer
                 playerFinalTotals={appState.playerFinalTotals}
+                dealerHand={appState.dealerHand}
                 onHasFinishedPlaying={setDealerFinalHandOfCards}
             />
             <Player
@@ -73,6 +82,7 @@ export function App() {
                     setAppState({ ...appState, bettingState })
                 }
                 onBankrollUpdate={updateBankroll}
+                onResetDealerHand={resetDealerHand}
             />
 
             <div className={styles.tableMarkings}>
