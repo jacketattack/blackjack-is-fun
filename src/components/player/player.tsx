@@ -71,7 +71,10 @@ export const Player = (props: PlayerProps) => {
         }
     }, [props.dealerHand, playerState.blackjackHands.length])
 
-    const dealerHandTotal: CardTotal = useHandOfCardsTotal(props.dealerHand)
+    // Calculate dealer hand total manually to ensure it's up-to-date
+    const dealerHandTotal: CardTotal = calculateHandOfCardsTotal(
+        props.dealerHand
+    )
 
     function dealerTotalIsTwentyOne(): boolean {
         return calculateHandOfCardsTotal(props.dealerHand).total === 21
@@ -108,7 +111,7 @@ export const Player = (props: PlayerProps) => {
             activeHandIndex: 0,
         })
 
-        // Don't reset dealer hand here—let the Dealer component handle the initial deal
+        // Don't reset dealer hand here-let the Dealer component handle the initial deal
     }
 
     function resetGame(): void {
@@ -201,6 +204,13 @@ export const Player = (props: PlayerProps) => {
         })
     }
 
+    function isBlackjack(hand: BlackjackHand): boolean {
+        return (
+            hand.cards.length === 2 &&
+            calculateHandOfCardsTotal(hand.cards).total === 21
+        )
+    }
+
     function calculateWinnings(dealerTotal: number): number {
         let winnings = 0
         playerState.blackjackHands.forEach((hand) => {
@@ -208,13 +218,25 @@ export const Player = (props: PlayerProps) => {
             const bet = hand.bet || 0
 
             if (playerTotal > 21) {
-                winnings -= bet // Player loses bet
-            } else if (dealerTotal > 21 || playerTotal > dealerTotal) {
-                winnings += bet // Player wins bet
+                winnings -= bet // Player loses bet (bust)
+            } else if (dealerTotal > 21) {
+                // Player wins (dealer bust)
+                if (isBlackjack(hand)) {
+                    winnings += Math.floor(bet * 1.5) // Blackjack pays 3:2 (net winnings: 1.5x bet)
+                } else {
+                    winnings += bet // Regular win pays 1:1 (net winnings: 1x bet)
+                }
+            } else if (playerTotal > dealerTotal) {
+                // Player wins (higher total)
+                if (isBlackjack(hand)) {
+                    winnings += Math.floor(bet * 1.5) // Blackjack pays 3:2 (net winnings: 1.5x bet)
+                } else {
+                    winnings += bet // Regular win pays 1:1 (net winnings: 1x bet)
+                }
             } else if (playerTotal === dealerTotal) {
-                winnings += 0 // Push, no change
+                winnings += 0 // Push, no net change (original bet is already in bankroll)
             } else {
-                winnings -= bet // Player loses bet
+                winnings -= bet // Player loses (lower total)
             }
         })
         return winnings
@@ -244,11 +266,7 @@ export const Player = (props: PlayerProps) => {
 
     // Handle dealer's final hand and update bankroll
     useEffect(() => {
-        if (
-            playerIsFinished() &&
-            props.dealerHand.length > 0 &&
-            dealerHandTotal.total > 0
-        ) {
+        if (playerIsFinished() && props.dealerHand.length > 0) {
             const winnings = calculateWinnings(dealerHandTotal.total)
             props.onBankrollUpdate(winnings)
         }
