@@ -36,12 +36,16 @@ export function placeBet(state: BettingState): BettingState {
 
 /**
  * Adds winnings to the bankroll (for wins)
- * Winnings = currentBet * 2 (original bet + winnings)
+ * @param state - Current betting state
+ * @param payoutMultiplier - Payout multiplier (default 2 for regular win, 2.5 for blackjack)
  */
-export function addWinnings(state: BettingState): BettingState {
+export function addWinnings(
+    state: BettingState,
+    payoutMultiplier: number = 2
+): BettingState {
     return {
         ...state,
-        bankroll: state.bankroll + state.currentBet * 2,
+        bankroll: state.bankroll + state.currentBet * payoutMultiplier,
         currentBet: 0,
     }
 }

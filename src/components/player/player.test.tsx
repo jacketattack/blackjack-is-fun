@@ -13,6 +13,7 @@ describe('Player Component', () => {
         jest.spyOn(deck, 'dealHand').mockReturnValue({
             cards: cards,
             finished: false,
+            bet: 0,
         })
     }
 

@@ -13,6 +13,7 @@ import {
     canSplit as canSplitBet,
     doubleDownBet,
     splitBet,
+    addWinnings,
 } from '../../services/betting'
 import { HandOfCards } from '../hand-of-cards/hand-of-cards'
 import { PlayerActions } from '../player-actions/player-actions'
@@ -25,7 +26,6 @@ interface PlayerProps {
     bettingState: BettingState
     onHasFinishedActions(playerFinalHandsOfCards: BlackjackHand[]): void
     onBettingStateChange(bettingState: BettingState): void
-    onBankrollUpdate: (winnings: number) => void
     onResetDealerHand?: () => void
 }
 
@@ -211,35 +211,26 @@ export const Player = (props: PlayerProps) => {
         )
     }
 
-    function calculateWinnings(dealerTotal: number): number {
-        let winnings = 0
-        playerState.blackjackHands.forEach((hand) => {
-            const playerTotal = calculateHandOfCardsTotal(hand.cards).total
-            const bet = hand.bet || 0
+    function calculatePayoutMultiplier(
+        hand: BlackjackHand,
+        dealerTotal: number
+    ): number {
+        const playerTotal = calculateHandOfCardsTotal(hand.cards).total
+        const bet = hand.bet || 0
 
-            if (playerTotal > 21) {
-                winnings -= bet // Player loses bet (bust)
-            } else if (dealerTotal > 21) {
-                // Player wins (dealer bust)
-                if (isBlackjack(hand)) {
-                    winnings += Math.floor(bet * 1.5) // Blackjack pays 3:2 (net winnings: 1.5x bet)
-                } else {
-                    winnings += bet // Regular win pays 1:1 (net winnings: 1x bet)
-                }
-            } else if (playerTotal > dealerTotal) {
-                // Player wins (higher total)
-                if (isBlackjack(hand)) {
-                    winnings += Math.floor(bet * 1.5) // Blackjack pays 3:2 (net winnings: 1.5x bet)
-                } else {
-                    winnings += bet // Regular win pays 1:1 (net winnings: 1x bet)
-                }
-            } else if (playerTotal === dealerTotal) {
-                winnings += 0 // Push, no net change (original bet is already in bankroll)
-            } else {
-                winnings -= bet // Player loses (lower total)
-            }
-        })
-        return winnings
+        if (playerTotal > 21) {
+            return 0 // Player loses bet (bust)
+        } else if (dealerTotal > 21) {
+            // Player wins (dealer bust)
+            return isBlackjack(hand) ? 2.5 : 2 // Blackjack: 3:2 (2.5x), Regular: 1:1 (2x)
+        } else if (playerTotal > dealerTotal) {
+            // Player wins (higher total)
+            return isBlackjack(hand) ? 2.5 : 2 // Blackjack: 3:2 (2.5x), Regular: 1:1 (2x)
+        } else if (playerTotal === dealerTotal) {
+            return 1 // Push, no net change (original bet is already in bankroll)
+        } else {
+            return 0 // Player loses (lower total)
+        }
     }
 
     function stand(): void {
@@ -267,8 +258,18 @@ export const Player = (props: PlayerProps) => {
     // Handle dealer's final hand and update bankroll
     useEffect(() => {
         if (playerIsFinished() && props.dealerHand.length > 0) {
-            const winnings = calculateWinnings(dealerHandTotal.total)
-            props.onBankrollUpdate(winnings)
+            let updatedBettingState = props.bettingState
+            playerState.blackjackHands.forEach((hand) => {
+                const payoutMultiplier = calculatePayoutMultiplier(
+                    hand,
+                    dealerHandTotal.total
+                )
+                updatedBettingState = addWinnings(
+                    updatedBettingState,
+                    payoutMultiplier
+                )
+            })
+            props.onBettingStateChange(updatedBettingState)
         }
     }, [
         props.dealerHand,

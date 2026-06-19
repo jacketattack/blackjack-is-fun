@@ -52,17 +52,6 @@ export function App() {
         })
     }
 
-    const updateBankroll = (winnings: number): void => {
-        setAppState({
-            ...appState,
-            bettingState: {
-                ...appState.bettingState,
-                bankroll: appState.bettingState.bankroll + winnings,
-                currentBet: 0,
-            },
-        })
-    }
-
     return (
         <div className={styles.game}>
             <Title />
@@ -79,7 +68,6 @@ export function App() {
                 onBettingStateChange={(bettingState) =>
                     setAppState({ ...appState, bettingState })
                 }
-                onBankrollUpdate={updateBankroll}
                 onResetDealerHand={resetDealerHand}
             />
 

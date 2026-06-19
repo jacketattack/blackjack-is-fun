@@ -72,7 +72,7 @@ describe('Betting Service', () => {
     })
 
     describe('addWinnings', () => {
-        it('should add double the current bet to bankroll', () => {
+        it('should add double the current bet to bankroll for regular win', () => {
             const state: BettingState = {
                 bankroll: 90,
                 betAmount: 10,
@@ -80,6 +80,17 @@ describe('Betting Service', () => {
             }
             const result = addWinnings(state)
             expect(result.bankroll).toBe(110)
+            expect(result.currentBet).toBe(0)
+        })
+
+        it('should add 2.5x the current bet to bankroll for blackjack win', () => {
+            const state: BettingState = {
+                bankroll: 90,
+                betAmount: 10,
+                currentBet: 10,
+            }
+            const result = addWinnings(state, 2.5)
+            expect(result.bankroll).toBe(115)
             expect(result.currentBet).toBe(0)
         })
 

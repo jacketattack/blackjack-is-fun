@@ -8,6 +8,15 @@ import { CardSuit, CardValue } from '../../interfaces/card.interface'
 // Clear mocks before each test
 beforeEach(() => {
     jest.clearAllMocks()
+    // Default mock for dealHand to include bet field
+    jest.spyOn(deck, 'dealHand').mockReturnValue({
+        cards: [
+            { value: CardValue.TEN, suit: CardSuit.CLUBS },
+            { value: CardValue.TEN, suit: CardSuit.DIAMONDS },
+        ],
+        finished: false,
+        bet: 0,
+    })
 })
 
 test('Renders app', () => {
@@ -28,6 +37,7 @@ test('Player and dealer totals are displayed after finishing game', async () => 
                     { value: CardValue.TEN, suit: CardSuit.DIAMONDS },
                 ],
                 finished: false,
+                bet: 0,
             },
             {
                 cards: [
@@ -35,6 +45,7 @@ test('Player and dealer totals are displayed after finishing game', async () => 
                     { value: CardValue.SEVEN, suit: CardSuit.DIAMONDS },
                 ],
                 finished: false,
+                bet: 0,
             },
         ]
         return hands[callCount++]
@@ -58,6 +69,7 @@ test.skip('Player is dealt two kings', () => {
                     { value: CardValue.KING, suit: CardSuit.DIAMONDS },
                 ],
                 finished: false,
+                bet: 0,
             },
             {
                 cards: [
@@ -65,6 +77,7 @@ test.skip('Player is dealt two kings', () => {
                     { value: CardValue.TEN, suit: CardSuit.DIAMONDS },
                 ],
                 finished: false,
+                bet: 0,
             },
         ]
         return hands[callCount++]
@@ -89,6 +102,7 @@ test.skip('Player won', () => {
                     { value: CardValue.TEN, suit: CardSuit.DIAMONDS },
                 ],
                 finished: false,
+                bet: 0,
             },
             {
                 cards: [
@@ -96,6 +110,7 @@ test.skip('Player won', () => {
                     { value: CardValue.TEN, suit: CardSuit.DIAMONDS },
                 ],
                 finished: false,
+                bet: 0,
             },
         ]
         return hands[callCount++]
@@ -119,6 +134,7 @@ test('Dealer hand resets when starting a new game', () => {
                     { value: CardValue.TEN, suit: CardSuit.DIAMONDS },
                 ],
                 finished: false,
+                bet: 0,
             },
             {
                 cards: [
@@ -126,6 +142,7 @@ test('Dealer hand resets when starting a new game', () => {
                     { value: CardValue.SEVEN, suit: CardSuit.DIAMONDS },
                 ],
                 finished: false,
+                bet: 0,
             },
         ]
         return hands[callCount++]
@@ -174,6 +191,7 @@ test.skip('Player lost when dealer is dealt a blackjack', () => {
                     { value: CardValue.TEN, suit: CardSuit.DIAMONDS },
                 ],
                 finished: false,
+                bet: 0,
             },
             {
                 cards: [
@@ -181,6 +199,7 @@ test.skip('Player lost when dealer is dealt a blackjack', () => {
                     { value: CardValue.KING, suit: CardSuit.DIAMONDS },
                 ],
                 finished: false,
+                bet: 0,
             },
         ]
         return hands[callCount++]
