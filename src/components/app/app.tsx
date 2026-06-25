@@ -2,8 +2,15 @@ import { Dispatch, SetStateAction, useState } from 'react'
 
 import { BlackjackHand, Card } from '../../interfaces/card.interface'
 import calculateHandOfCardsTotal from '../../services/handOfCardsCalculation'
+import {
+    checkInsuranceOffered,
+    dealerHasBlackjack,
+} from '../../services/insurance'
 import { Dealer } from '../dealer/dealer'
 import { DeckStatus } from '../deck-status/deck-status'
+import { Bankroll } from '../bankroll/bankroll'
+import { HandHistory } from '../hand-history/hand-history'
+import { Insurance } from '../insurance/insurance'
 import { Player } from '../player/player'
 import { Title } from '../title/title'
 import * as styles from './app.module.css'
@@ -11,6 +18,9 @@ import * as styles from './app.module.css'
 interface AppState {
     playerFinalTotals: number[]
     dealerHand: Card[]
+    insuranceOffered: boolean
+    insuranceAccepted: boolean
+    dealerHasBlackjack: boolean
 }
 
 export function App() {
@@ -20,6 +30,9 @@ export function App() {
     ] = useState({
         playerFinalTotals: [],
         dealerHand: [],
+        insuranceOffered: false,
+        insuranceAccepted: false,
+        dealerHasBlackjack: false,
     })
 
     function notifyDealerToPlay(
@@ -36,10 +49,43 @@ export function App() {
     }
 
     function setDealerFinalHandOfCards(dealerFinalHandOfCards: Card[]): void {
+        // Check if dealer has blackjack
+        const hasBlackjack = dealerHasBlackjack(dealerFinalHandOfCards)
+
         setAppState({
             ...appState,
             dealerHand: dealerFinalHandOfCards,
+            dealerHasBlackjack: hasBlackjack,
         })
+    }
+
+    function handleInsuranceAccepted(): void {
+        setAppState({
+            ...appState,
+            insuranceOffered: false,
+            insuranceAccepted: true,
+        })
+    }
+
+    function handleInsuranceDeclined(): void {
+        setAppState({
+            ...appState,
+            insuranceOffered: false,
+            insuranceAccepted: false,
+        })
+    }
+
+    function checkAndOfferInsurance(dealerCards: Card[]): void {
+        if (dealerCards.length > 0) {
+            const firstCard = dealerCards[0]
+            if (checkInsuranceOffered(firstCard)) {
+                setAppState({
+                    ...appState,
+                    insuranceOffered: true,
+                    insuranceAccepted: false,
+                })
+            }
+        }
     }
 
     return (
@@ -67,7 +113,34 @@ export function App() {
                 name="PLAYER"
                 onHasFinishedActions={notifyDealerToPlay}
                 dealerHand={appState.dealerHand}
+                onDeal={checkAndOfferInsurance}
             />
+
+            {appState.insuranceOffered && (
+                <Insurance
+                    originalBet={10}
+                    onAccept={handleInsuranceAccepted}
+                    onDecline={handleInsuranceDeclined}
+                />
+            )}
+
+            {appState.insuranceAccepted && appState.dealerHasBlackjack && (
+                <div
+                    className={`${styles.insuranceResult} ${styles.insuranceResultWin}`}
+                >
+                    Insurance Paid! Dealer has Blackjack.
+                </div>
+            )}
+
+            {appState.insuranceAccepted && !appState.dealerHasBlackjack && (
+                <div
+                    className={`${styles.insuranceResult} ${styles.insuranceResultLoss}`}
+                >
+                    Insurance Lost. Dealer does not have Blackjack.
+                </div>
+            )}
+            <Bankroll />
+            <HandHistory />
         </div>
     )
 }
