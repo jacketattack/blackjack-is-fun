@@ -3,6 +3,7 @@ import { Dispatch, SetStateAction, useState } from 'react'
 import { BlackjackHand, Card } from '../../interfaces/card.interface'
 import calculateHandOfCardsTotal from '../../services/handOfCardsCalculation'
 import { Dealer } from '../dealer/dealer'
+import { DeckStatus } from '../deck-status/deck-status'
 import { Player } from '../player/player'
 import { Title } from '../title/title'
 import * as styles from './app.module.css'
@@ -44,6 +45,7 @@ export function App() {
     return (
         <div className={styles.game}>
             <Title />
+            <DeckStatus />
             <Dealer
                 playerFinalTotals={appState.playerFinalTotals}
                 onHasFinishedPlaying={setDealerFinalHandOfCards}
