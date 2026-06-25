@@ -5,6 +5,7 @@ import calculateHandOfCardsTotal from '../../services/handOfCardsCalculation'
 import { Dealer } from '../dealer/dealer'
 import { Player } from '../player/player'
 import { Title } from '../title/title'
+import { HandHistory } from '../hand-history/hand-history'
 import * as styles from './app.module.css'
 
 interface AppState {
@@ -66,6 +67,7 @@ export function App() {
                 onHasFinishedActions={notifyDealerToPlay}
                 dealerHand={appState.dealerHand}
             />
+            <HandHistory />
         </div>
     )
 }
