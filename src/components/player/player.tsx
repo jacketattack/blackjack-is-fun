@@ -15,6 +15,7 @@ interface PlayerProps {
     name: string
     dealerHand: Card[]
     onHasFinishedActions(playerFinalHandsOfCards: BlackjackHand[]): void
+    onDeal?: (dealerCards: Card[]) => void
 }
 
 interface PlayerState {
@@ -30,6 +31,20 @@ export const Player = (props: PlayerProps) => {
         blackjackHands: [dealHand()],
         activeHandIndex: 0,
     })
+
+    // Notify parent when a new hand is dealt
+    useEffect(() => {
+        if (
+            playerState.blackjackHands.length === 1 &&
+            playerState.blackjackHands[0].cards.length === 2
+        ) {
+            // This is a fresh deal
+            const dealerCards = props.dealerHand
+            if (dealerCards.length >= 1 && props.onDeal) {
+                props.onDeal(dealerCards)
+            }
+        }
+    }, [playerState.blackjackHands, props.dealerHand, props.onDeal])
 
     useEffect(() => {
         if (dealerTotalIsTwentyOne()) {
