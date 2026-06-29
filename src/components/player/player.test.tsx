@@ -141,4 +141,203 @@ describe('Player Component', () => {
         expect(screen.getByText(/Total: 18/)).toBeInTheDocument() // 8 + 10
         expect(screen.getByText(/Total: 10/)).toBeInTheDocument() // 8 + 2
     })
+
+    test('doubles down when requested', () => {
+        mockInitialDeal([
+            { value: CardValue.TEN, suit: CardSuit.CLUBS },
+            { value: CardValue.NINE, suit: CardSuit.DIAMONDS },
+        ])
+        jest.spyOn(deck, 'drawCard').mockReturnValue({
+            value: CardValue.TWO,
+            suit: CardSuit.SPADES,
+        })
+
+        const onFinished = jest.fn()
+        render(
+            <Player
+                name="PLAYER"
+                dealerHand={[]}
+                onHasFinishedActions={onFinished}
+            />
+        )
+
+        fireEvent.click(screen.getByText('DOUBLE DOWN'))
+
+        // Should have drawn one card (now has 3 cards total)
+        expect(screen.getByText(/Total: 21/)).toBeInTheDocument() // 10 + 9 + 2
+        // Should have finished the hand and called onHasFinishedActions
+        expect(onFinished).toHaveBeenCalled()
+    })
+
+    test('cannot double down with more than 2 cards', () => {
+        // Start with a hand that won't bust or reach 21 when hitting
+        mockInitialDeal([
+            { value: CardValue.TEN, suit: CardSuit.CLUBS },
+            { value: CardValue.TWO, suit: CardSuit.DIAMONDS },
+        ])
+        jest.spyOn(deck, 'drawCard').mockReturnValue({
+            value: CardValue.THREE,
+            suit: CardSuit.SPADES,
+        })
+
+        render(
+            <Player
+                name="PLAYER"
+                dealerHand={[]}
+                onHasFinishedActions={jest.fn()}
+            />
+        )
+
+        // Hit first to get 3 cards (10 + 2 + 3 = 15, won't auto-stand)
+        fireEvent.click(screen.getByText('HIT'))
+
+        // Double Down button should now be disabled
+        expect(screen.getByText('DOUBLE DOWN')).toBeDisabled()
+    })
+
+    test('cannot split with more than 2 cards', () => {
+        // Start with a pair that won't bust or reach 21 when hitting
+        mockInitialDeal([
+            { value: CardValue.EIGHT, suit: CardSuit.CLUBS },
+            { value: CardValue.EIGHT, suit: CardSuit.DIAMONDS },
+        ])
+        jest.spyOn(deck, 'drawCard').mockReturnValue({
+            value: CardValue.TWO,
+            suit: CardSuit.SPADES,
+        })
+
+        render(
+            <Player
+                name="PLAYER"
+                dealerHand={[]}
+                onHasFinishedActions={jest.fn()}
+            />
+        )
+
+        // Hit first to get 3 cards (8 + 8 + 2 = 18, won't auto-stand)
+        fireEvent.click(screen.getByText('HIT'))
+
+        // Split button should now be disabled (find it by role to avoid text matching issues)
+        const splitButton = screen.getByText('SPLIT')
+        expect(splitButton).toBeDisabled()
+    })
+
+    test('cannot split non-pair hands', () => {
+        mockInitialDeal([
+            { value: CardValue.TEN, suit: CardSuit.CLUBS },
+            { value: CardValue.NINE, suit: CardSuit.DIAMONDS },
+        ])
+
+        render(
+            <Player
+                name="PLAYER"
+                dealerHand={[]}
+                onHasFinishedActions={jest.fn()}
+            />
+        )
+
+        // Split button should be disabled for non-pair
+        expect(screen.getByText('SPLIT')).toBeDisabled()
+    })
+
+    test('splitting creates two independent hands that can be played', () => {
+        mockInitialDeal([
+            { value: CardValue.EIGHT, suit: CardSuit.CLUBS },
+            { value: CardValue.EIGHT, suit: CardSuit.DIAMONDS },
+        ])
+        // Mock drawCard for split and subsequent hits
+        jest.spyOn(deck, 'drawCard')
+            .mockReturnValueOnce({
+                value: CardValue.TEN,
+                suit: CardSuit.HEARTS,
+            }) // First split card
+            .mockReturnValueOnce({
+                value: CardValue.TWO,
+                suit: CardSuit.SPADES,
+            }) // Second split card
+            .mockReturnValueOnce({ value: CardValue.TWO, suit: CardSuit.CLUBS }) // Hit on first hand (8 + 10 + 2 = 20, won't bust)
+
+        const onFinished = jest.fn()
+        render(
+            <Player
+                name="PLAYER"
+                dealerHand={[]}
+                onHasFinishedActions={onFinished}
+            />
+        )
+
+        // Split the hand
+        fireEvent.click(screen.getByText('SPLIT'))
+
+        // Should have two hands
+        const hands = screen.getAllByTestId('hand-of-cards')
+        expect(hands.length).toBe(2)
+
+        // Hit on the first hand
+        fireEvent.click(screen.getByText('HIT'))
+
+        // Should still have two hands, first hand should have 3 cards (8 + 10 + 2 = 20)
+        expect(screen.getByText(/Total: 20/)).toBeInTheDocument()
+        expect(screen.getByText(/Total: 10/)).toBeInTheDocument() // 8 + 2
+    })
+
+    test('doubling down finishes the hand immediately', () => {
+        mockInitialDeal([
+            { value: CardValue.TEN, suit: CardSuit.CLUBS },
+            { value: CardValue.NINE, suit: CardSuit.DIAMONDS },
+        ])
+        jest.spyOn(deck, 'drawCard').mockReturnValue({
+            value: CardValue.TWO,
+            suit: CardSuit.SPADES,
+        })
+
+        const onFinished = jest.fn()
+        render(
+            <Player
+                name="PLAYER"
+                dealerHand={[]}
+                onHasFinishedActions={onFinished}
+            />
+        )
+
+        fireEvent.click(screen.getByText('DOUBLE DOWN'))
+
+        // onHasFinishedActions should be called since the hand is finished
+        expect(onFinished).toHaveBeenCalled()
+
+        // The hand should be marked as finished, so we should see the result
+        // (though we need dealer hand to see the actual result)
+        const hands = screen.getAllByTestId('hand-of-cards')
+        expect(hands.length).toBe(1)
+    })
+
+    test('splitting Aces creates two hands with one Ace each', () => {
+        mockInitialDeal([
+            { value: CardValue.ACE, suit: CardSuit.CLUBS },
+            { value: CardValue.ACE, suit: CardSuit.DIAMONDS },
+        ])
+        jest.spyOn(deck, 'drawCard')
+            .mockReturnValueOnce({
+                value: CardValue.TEN,
+                suit: CardSuit.HEARTS,
+            })
+            .mockReturnValueOnce({
+                value: CardValue.KING,
+                suit: CardSuit.SPADES,
+            })
+
+        render(
+            <Player
+                name="PLAYER"
+                dealerHand={[]}
+                onHasFinishedActions={jest.fn()}
+            />
+        )
+
+        fireEvent.click(screen.getByText('SPLIT'))
+
+        // Should have two hands with Ace + 10 and Ace + King
+        // Both should show BLACKJACK since they have 2 cards totaling 21
+        expect(screen.getAllByText('BLACKJACK')).toHaveLength(2)
+    })
 })
