@@ -28,3 +28,102 @@
     padding: 10px;
     background-color: rgba(255, 255, 255, 0.1);
 }
+
+.newGameContainer {
+    margin: 20px 0;
+    padding: 15px;
+    border: 2px solid #4a9eff;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.betInputContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.betInput {
+    padding: 8px 12px;
+    font-size: 16px;
+    border: 2px solid #4a9eff;
+    border-radius: 5px;
+    width: 80px;
+    text-align: center;
+}
+
+.setBetButton {
+    padding: 8px 15px;
+    font-size: 14px;
+    font-weight: bold;
+    background-color: #4a9eff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.setBetButton:hover {
+    background-color: #357abd;
+}
+
+.setBetButton:active {
+    transform: scale(0.98);
+}
+
+.newGameButton {
+    padding: 10px 30px;
+    font-size: 16px;
+    font-weight: bold;
+    background-color: #4a9eff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.newGameButton:hover {
+    background-color: #357abd;
+}
+
+.newGameButton:active {
+    transform: scale(0.98);
+}
+
+.noFundsMessage {
+    color: #ff6b6b;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.betInfo {
+    margin: 10px 0;
+    padding: 10px;
+    background-color: rgba(74, 158, 255, 0.1);
+    border-left: 4px solid #4a9eff;
+    border-radius: 4px;
+}
+
+.currentBet {
+    font-size: 16px;
+    font-weight: 600;
+    color: #4a9eff;
+}
+
+.bankrollDisplay {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    padding: 15px 25px;
+    background-color: rgba(74, 158, 255, 0.95);
+    color: white;
+    font-size: 18px;
+    font-weight: bold;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    z-index: 100;
+}

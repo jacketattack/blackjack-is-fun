@@ -9,20 +9,31 @@ import * as styles from './dealer.module.css'
 
 interface DealerProps {
     playerFinalTotals: number[]
+    dealerHand: Card[]
     onHasFinishedPlaying(dealerFinalHandOfCards: Card[]): void
-}
-
-interface DealerState {
-    blackjackHand: BlackjackHand
 }
 
 export const Dealer = (props: DealerProps) => {
     let [dealerState, setDealerState]: [
-        DealerState,
-        Dispatch<SetStateAction<DealerState>>,
+        { blackjackHand: BlackjackHand },
+        Dispatch<SetStateAction<{ blackjackHand: BlackjackHand }>>,
     ] = useState({
-        blackjackHand: dealHand(),
+        blackjackHand: dealHand(), // Deal initial hand
     })
+
+    // Reset dealer hand when props.dealerHand changes (e.g., new game)
+    useEffect(() => {
+        if (props.dealerHand && props.dealerHand.length > 0) {
+            setDealerState({
+                blackjackHand: { cards: props.dealerHand, finished: false },
+            })
+        } else {
+            // If dealerHand is empty, deal a new hand (start of game)
+            setDealerState({
+                blackjackHand: dealHand(),
+            })
+        }
+    }, [props.dealerHand])
     useEffect(() => {
         if (
             hasPlayerFinishedPlaying() &&
@@ -55,6 +66,7 @@ export const Dealer = (props: DealerProps) => {
 
     function isDealerOpeningHand(): boolean {
         return (
+            dealerState.blackjackHand.cards &&
             dealerState.blackjackHand.cards.length === 2 &&
             props.playerFinalTotals.length === 0
         )
@@ -81,16 +93,21 @@ export const Dealer = (props: DealerProps) => {
         return {
             ...dealerState.blackjackHand,
             cards:
-                isDealerOpeningHand() && !dealerTotalIsTwentyOne()
+                isDealerOpeningHand() &&
+                !dealerTotalIsTwentyOne() &&
+                dealerState.blackjackHand.cards.length > 0
                     ? [dealerState.blackjackHand.cards[0]]
-                    : dealerState.blackjackHand.cards,
+                    : dealerState.blackjackHand.cards || [],
         }
     }
 
     return (
         <div className={styles.dealer}>
             <div className={styles.name}>DEALER</div>
-            <HandOfCards blackjackHand={getCardsToDisplay()} />
+            {dealerState.blackjackHand.cards &&
+                dealerState.blackjackHand.cards.length > 0 && (
+                    <HandOfCards blackjackHand={getCardsToDisplay()} />
+                )}
         </div>
     )
 }

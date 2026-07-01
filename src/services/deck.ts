@@ -16,6 +16,7 @@ export function dealHand(): BlackjackHand {
     return {
         cards: [drawCard(), drawCard()],
         finished: false,
+        bet: 0, // Initialize bet field
     }
 }
 
