@@ -340,4 +340,114 @@ describe('Player Component', () => {
         // Both should show BLACKJACK since they have 2 cards totaling 21
         expect(screen.getAllByText('BLACKJACK')).toHaveLength(2)
     })
+
+    test('doubles down and busts', () => {
+        mockInitialDeal([
+            { value: CardValue.KING, suit: CardSuit.CLUBS },
+            { value: CardValue.NINE, suit: CardSuit.DIAMONDS },
+        ])
+        jest.spyOn(deck, 'drawCard').mockReturnValue({
+            value: CardValue.THREE,
+            suit: CardSuit.SPADES,
+        })
+
+        const onFinished = jest.fn()
+        render(
+            <Player
+                name="PLAYER"
+                dealerHand={[]}
+                onHasFinishedActions={onFinished}
+            />
+        )
+
+        fireEvent.click(screen.getByText('DOUBLE DOWN'))
+
+        // Should have drawn one card (King + 9 + 3 = 22, bust)
+        // When player busts, UI shows "BUST" instead of the total
+        expect(screen.getByText('BUST')).toBeInTheDocument()
+        // Should have finished the hand and called onHasFinishedActions
+        expect(onFinished).toHaveBeenCalled()
+    })
+
+    test('doubles down with soft hand containing ace', () => {
+        mockInitialDeal([
+            { value: CardValue.ACE, suit: CardSuit.CLUBS },
+            { value: CardValue.FIVE, suit: CardSuit.DIAMONDS },
+        ])
+        jest.spyOn(deck, 'drawCard').mockReturnValue({
+            value: CardValue.FIVE,
+            suit: CardSuit.SPADES,
+        })
+
+        const onFinished = jest.fn()
+        render(
+            <Player
+                name="PLAYER"
+                dealerHand={[]}
+                onHasFinishedActions={onFinished}
+            />
+        )
+
+        fireEvent.click(screen.getByText('DOUBLE DOWN'))
+
+        // Should have drawn one card (Ace + 5 + 5)
+        // Hard total = 1 + 5 + 5 = 11, soft total = 11 + 10 = 21
+        // The UI shows "Total: 21" because when total is 21, it doesn't show "Soft" prefix
+        expect(screen.getByText('Total: 21')).toBeInTheDocument()
+        // Should have finished the hand and called onHasFinishedActions
+        expect(onFinished).toHaveBeenCalled()
+    })
+
+    test('doubles down to exactly 21', () => {
+        mockInitialDeal([
+            { value: CardValue.TEN, suit: CardSuit.CLUBS },
+            { value: CardValue.NINE, suit: CardSuit.DIAMONDS },
+        ])
+        jest.spyOn(deck, 'drawCard').mockReturnValue({
+            value: CardValue.TWO,
+            suit: CardSuit.SPADES,
+        })
+
+        const onFinished = jest.fn()
+        render(
+            <Player
+                name="PLAYER"
+                dealerHand={[]}
+                onHasFinishedActions={onFinished}
+            />
+        )
+
+        fireEvent.click(screen.getByText('DOUBLE DOWN'))
+
+        // Should have drawn one card (10 + 9 + 2 = 21)
+        expect(screen.getByText(/Total: 21/)).toBeInTheDocument()
+        // Should have finished the hand and called onHasFinishedActions
+        expect(onFinished).toHaveBeenCalled()
+    })
+
+    test('doubling down finishes the hand immediately', () => {
+        mockInitialDeal([
+            { value: CardValue.TEN, suit: CardSuit.CLUBS },
+            { value: CardValue.EIGHT, suit: CardSuit.DIAMONDS },
+        ])
+        jest.spyOn(deck, 'drawCard').mockReturnValue({
+            value: CardValue.TWO,
+            suit: CardSuit.SPADES,
+        })
+
+        const onFinished = jest.fn()
+        render(
+            <Player
+                name="PLAYER"
+                dealerHand={[]}
+                onHasFinishedActions={onFinished}
+            />
+        )
+
+        fireEvent.click(screen.getByText('DOUBLE DOWN'))
+
+        // After doubling down, the hand should be finished
+        // The double down button should be disabled for the next hand (if any)
+        expect(onFinished).toHaveBeenCalled()
+    })
 })
