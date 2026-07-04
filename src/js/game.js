@@ -210,10 +210,11 @@ function disableDoubleDown() {
 
 function doubleDown() {
     hit();
-    // TODO: bug is here.. do not play for dealer if game is over
-    if (!isGameOver()) {
-        playForDealer();
+    // Check if game is over (player busted or got blackjack) before dealer plays
+    if (isGameOver()) {
+        return;
     }
+    playForDealer();
 }
 
 function isGameOver() {
@@ -319,5 +320,14 @@ function enableActionButtons() {
         actionButton.removeAttribute('disabled');
     }
 }
+
+module.exports = {
+    doubleDown,
+    isGameOver,
+    playerLoses,
+    playerWins,
+    restartGame,
+    playForDealer,
+};
 
 startGame();
