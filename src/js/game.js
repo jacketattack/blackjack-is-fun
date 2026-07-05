@@ -41,12 +41,38 @@ function enableSplitAction() {
 }
 
 function split() {
-    console.log('IMPLEMENT ME');
-    // TODO: tooltip
-    // make two hands
-    // make them separate sections but add class to denote one as active
-    // allow for resplit..
-    // i guess it's just hte same .. kind of recursive operation
+    // Check if the player has a pair
+    const firstCardValue = convertCardValueToBlackjackValue(playerHand[0][0]);
+    const secondCardValue = convertCardValueToBlackjackValue(playerHand[1][0]);
+
+    if (firstCardValue !== secondCardValue) {
+        console.log('Cannot split: Not a pair');
+        return;
+    }
+
+    // Create two new hands
+    const hand1 = [playerHand[0], dealOneCard()];
+    const hand2 = [playerHand[1], dealOneCard()];
+
+    // Store the original hand and set the first split hand as active
+    playerHand = hand1;
+    visualizePlayerHandAndTotal();
+
+    // Visual indicators for split hands
+    const playerHandElement = document.getElementById('visualPlayerHand');
+    playerHandElement.innerHTML = `
+        <div class="active-hand">${stringifyHand(hand1)}</div>
+        <div class="inactive-hand">${stringifyHand(hand2)}</div>
+    `;
+
+    // Tooltip for split action
+    const splitTooltip = document.createElement('div');
+    splitTooltip.className = 'tooltip';
+    splitTooltip.textContent = 'Playing first hand. Click "Switch Hand" to play the second hand.';
+    playerHandElement.appendChild(splitTooltip);
+
+    // Allow resplitting if another pair is dealt
+    enableSplitIfPlayerHasPair();
 }
 
 function dealOneCard() {
