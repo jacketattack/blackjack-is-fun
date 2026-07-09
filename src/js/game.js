@@ -5,6 +5,8 @@ function startGame() {
     // assume one player for now
     dealerHand = dealStartingHand();
     playerHand = dealStartingHand();
+    playerHands = []; // Reset split hands
+    activeHandIndex = 0; // Reset active hand index
 
     performSetupBeforePlayerDecision();
 }
@@ -40,13 +42,99 @@ function enableSplitAction() {
     document.getElementById('split').removeAttribute('disabled');
 }
 
+let playerHands = [];
+let activeHandIndex = 0;
+
 function split() {
-    console.log('IMPLEMENT ME');
-    // TODO: tooltip
-    // make two hands
-    // make them separate sections but add class to denote one as active
-    // allow for resplit..
-    // i guess it's just hte same .. kind of recursive operation
+    // Initialize playerHands with the original hand split into two
+    playerHands = [
+        [playerHand[0], dealOneCard()], // First hand: first card + new card
+        [playerHand[1], dealOneCard()]  // Second hand: second card + new card
+    ];
+    activeHandIndex = 0;
+    
+    // Visualize the first hand
+    visualizeActiveHand();
+    
+    // Disable split after use
+    document.getElementById('split').setAttribute('disabled', true);
+    
+    // Re-enable double down for the active hand if applicable
+    enableDoubleDown();
+}
+
+function visualizeActiveHand() {
+    document.getElementById('visualPlayerHand').textContent = stringifyHand(playerHands[activeHandIndex]);
+    document.getElementById('playerTotal').textContent = getVisualTotal(getCardValuesFromHand(playerHands[activeHandIndex]));
+}
+
+function getCardValuesFromHand(hand) {
+    return hand.map((cardData) => cardData[0]);
+}
+
+function switchToNextHand() {
+    if (activeHandIndex < playerHands.length - 1) {
+        activeHandIndex++;
+        visualizeActiveHand();
+        enableDoubleDown();
+    } else {
+        // All hands played, now play for dealer
+        playForDealerAfterSplit();
+    }
+}
+
+function playForDealerAfterSplit() {
+    // Resolve all hands against the dealer
+    let results = [];
+    for (let i = 0; i < playerHands.length; i++) {
+        let finalPlayerHard = calculateTotal(getCardValuesFromHand(playerHands[i])).hardValue;
+        let finalPlayerSoft = calculateTotal(getCardValuesFromHand(playerHands[i])).softValue;
+        let finalPlayerTotal = getTrueHandValue(finalPlayerHard, finalPlayerSoft);
+        
+        let finalDealerHard = calculateTotal(getCardValuesFromDealerHand()).hardValue;
+        let finalDealerSoft = calculateTotal(getCardValuesFromDealerHand()).softValue;
+        let finalDealerTotal = getTrueHandValue(finalDealerHard, finalDealerSoft);
+        
+        if (finalDealerTotal > 21) {
+            results.push('WIN');
+        } else if (finalDealerTotal > finalPlayerTotal) {
+            results.push('LOSE');
+        } else if (finalPlayerTotal > finalDealerTotal) {
+            results.push('WIN');
+        } else {
+            results.push('PUSH');
+        }
+    }
+    
+    // Determine overall result
+    if (results.every(result => result === 'WIN')) {
+        playerWins();
+    } else if (results.every(result => result === 'LOSE')) {
+        playerLoses();
+    } else {
+        setEndCondition('SPLIT RESULT: ' + results.join(', '));
+    }
+}
+
+function hit() {
+    if (playerHands.length > 0) {
+        // Handle split hands
+        playerHands[activeHandIndex].push(dealOneCard());
+        visualizeActiveHand();
+        disableDoubleDown();
+        
+        checkForPlayerBust();
+        if (isGameOver()) {
+            switchToNextHand();
+        }
+    } else {
+        // Original behavior for non-split hands
+        playerHand.push(dealOneCard());
+        visualizePlayerHandAndTotal();
+        disableDoubleDown();
+        
+        checkForPlayerBust();
+    }
 }
 
 function dealOneCard() {
