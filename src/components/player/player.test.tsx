@@ -137,8 +137,62 @@ describe('Player Component', () => {
         const hands = screen.getAllByTestId('hand-of-cards')
         expect(hands.length).toBe(2)
 
-        // Alternatively check for total displays
-        expect(screen.getByText(/Total: 18/)).toBeInTheDocument() // 8 + 10
-        expect(screen.getByText(/Total: 10/)).toBeInTheDocument() // 8 + 2
+        // Check for total displays - each hand should have one original card and one new card
+        expect(screen.getByText(/Total: 18/)).toBeInTheDocument() // 8 (CLUBS) + 10
+        expect(screen.getByText(/Total: 10/)).toBeInTheDocument() // 8 (DIAMONDS) + 2
+    })
+
+    test('doubles down when requested', () => {
+        mockInitialDeal([
+            { value: CardValue.TEN, suit: CardSuit.CLUBS },
+            { value: CardValue.TWO, suit: CardSuit.DIAMONDS },
+        ])
+        jest.spyOn(deck, 'drawCard').mockReturnValue({
+            value: CardValue.FIVE,
+            suit: CardSuit.HEARTS,
+        })
+
+        const onFinished = jest.fn()
+        render(
+            <Player
+                name="PLAYER"
+                dealerHand={[]}
+                onHasFinishedActions={onFinished}
+            />
+        )
+
+        fireEvent.click(screen.getByText('DOUBLE DOWN'))
+
+        // Should have added one card to the hand
+        expect(screen.getByText(/Total: 17/)).toBeInTheDocument() // 10 + 2 + 5
+        // Should have finished the hand and called onHasFinishedActions
+        expect(onFinished).toHaveBeenCalled()
+    })
+
+    test('does not play for dealer if player busts after doubling down', () => {
+        mockInitialDeal([
+            { value: CardValue.TEN, suit: CardSuit.CLUBS },
+            { value: CardValue.TEN, suit: CardSuit.DIAMONDS },
+        ])
+        jest.spyOn(deck, 'drawCard').mockReturnValue({
+            value: CardValue.TEN,
+            suit: CardSuit.HEARTS,
+        })
+
+        const onFinished = jest.fn()
+        render(
+            <Player
+                name="PLAYER"
+                dealerHand={[]}
+                onHasFinishedActions={onFinished}
+            />
+        )
+
+        fireEvent.click(screen.getByText('DOUBLE DOWN'))
+
+        // Should have busted (10 + 10 + 10 = 30)
+        expect(screen.getByText('BUST')).toBeInTheDocument()
+        // Should have finished the hand and called onHasFinishedActions
+        expect(onFinished).toHaveBeenCalled()
     })
 })

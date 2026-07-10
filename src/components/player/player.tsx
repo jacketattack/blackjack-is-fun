@@ -75,15 +75,15 @@ export const Player = (props: PlayerProps) => {
     }
 
     function split(): void {
-        const splitCard: Card =
-            playerState.blackjackHands[playerState.activeHandIndex].cards[0]
+        const originalHand: BlackjackHand =
+            playerState.blackjackHands[playerState.activeHandIndex]
         const splitHands: BlackjackHand[] = [
             {
-                cards: [splitCard, drawCard()],
+                cards: [originalHand.cards[0], drawCard()],
                 finished: false,
             },
             {
-                cards: [splitCard, drawCard()],
+                cards: [originalHand.cards[1], drawCard()],
                 finished: false,
             },
         ]
