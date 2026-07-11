@@ -1,5 +1,7 @@
 var dealerHand;
 var playerHand;
+var splitHands = [];
+var activeHandIndex = 0;
 
 function startGame() {
     // assume one player for now
@@ -41,12 +43,40 @@ function enableSplitAction() {
 }
 
 function split() {
-    console.log('IMPLEMENT ME');
-    // TODO: tooltip
-    // make two hands
-    // make them separate sections but add class to denote one as active
-    // allow for resplit..
-    // i guess it's just hte same .. kind of recursive operation
+    // Check if player has exactly 2 cards and they are a pair
+    if (playerHand.length !== 2) {
+        console.log('Cannot split: Player does not have exactly 2 cards.');
+        return;
+    }
+    
+    const firstCardValue = convertCardValueToBlackjackValue(playerHand[0][0]);
+    const secondCardValue = convertCardValueToBlackjackValue(playerHand[1][0]);
+    
+    if (firstCardValue !== secondCardValue) {
+        console.log('Cannot split: Cards are not a pair.');
+        return;
+    }
+    
+    // Create two split hands
+    const hand1 = [playerHand[0]];
+    const hand2 = [playerHand[1]];
+    
+    // Deal an additional card to each hand
+    hand1.push(dealOneCard());
+    hand2.push(dealOneCard());
+    
+    // Store split hands
+    splitHands = [hand1, hand2];
+    activeHandIndex = 0;
+    
+    // Update UI to show split hands
+    visualizeSplitHands();
+    
+    // Disable split button for now (can be re-enabled if active hand is a pair)
+    document.getElementById('split').setAttribute('disabled', true);
+    
+    // Check if active hand can be split again
+    checkForResplit();
 }
 
 function dealOneCard() {
@@ -82,9 +112,41 @@ function getCardValuesFromPlayerHand() {
 }
 
 function visualizePlayerHandAndTotal() {
-    document.getElementById('visualPlayerHand').textContent = stringifyHand(playerHand);
+    if (splitHands.length > 0) {
+        visualizeSplitHands();
+    } else {
+        document.getElementById('visualPlayerHand').textContent = stringifyHand(playerHand);
+        document.getElementById('playerTotal').textContent = getVisualTotal(getCardValuesFromPlayerHand());
+    }
+}
 
-    document.getElementById('playerTotal').textContent = getVisualTotal(getCardValuesFromPlayerHand());
+function visualizeSplitHands() {
+    const activeHand = splitHands[activeHandIndex];
+    const otherHand = splitHands[1 - activeHandIndex];
+    
+    // Display active hand with indicator
+    const activeHandStr = stringifyHand(activeHand);
+    const activeTotal = getVisualTotal(activeHand.map(card => card[0]));
+    
+    // Display other hand
+    const otherHandStr = stringifyHand(otherHand);
+    const otherTotal = getVisualTotal(otherHand.map(card => card[0]));
+    
+    // Update UI to show both hands
+    document.getElementById('visualPlayerHand').textContent = 
+        `Active: ${activeHandStr} (${activeTotal}) | Other: ${otherHandStr} (${otherTotal})`;
+    document.getElementById('playerTotal').textContent = `Active Total: ${activeTotal}`;
+}
+
+function checkForResplit() {
+    const activeHand = splitHands[activeHandIndex];
+    if (activeHand.length === 2) {
+        const firstCardValue = convertCardValueToBlackjackValue(activeHand[0][0]);
+        const secondCardValue = convertCardValueToBlackjackValue(activeHand[1][0]);
+        if (firstCardValue === secondCardValue) {
+            document.getElementById('split').removeAttribute('disabled');
+        }
+    }
 }
 
 function getVisualTotal(cardValues) {
@@ -185,11 +247,27 @@ function convertCardValueToBlackjackValue(cardValue) {
 }
 
 function hit(){
-    playerHand.push(dealOneCard());
-    visualizePlayerHandAndTotal();
-    disableDoubleDown();
+    if (splitHands.length > 0) {
+        // Add card to active split hand
+        splitHands[activeHandIndex].push(dealOneCard());
+        visualizeSplitHands();
+        disableDoubleDown();
+        checkForPlayerBustInActiveHand();
+    } else {
+        playerHand.push(dealOneCard());
+        visualizePlayerHandAndTotal();
+        disableDoubleDown();
+        checkForPlayerBust();
+    }
+}
 
-    checkForPlayerBust();
+function checkForPlayerBustInActiveHand() {
+    const activeHand = splitHands[activeHandIndex];
+    let activeHandTotal = calculateTotal(activeHand.map(card => card[0]));
+    if (activeHandTotal.hardValue > 21 && (activeHandTotal.softValue > 21 || activeHandTotal.softValue == null)) {
+        visualizeDealerHandAndTotal();
+        playerLoses();
+    }
 }
 
 function checkForPlayerBust() {
@@ -209,15 +287,63 @@ function disableDoubleDown() {
 }
 
 function doubleDown() {
-    hit();
-    // TODO: bug is here.. do not play for dealer if game is over
-    if (!isGameOver()) {
-        playForDealer();
+    if (splitHands.length > 0) {
+        // Double down on active split hand
+        hit();
+        if (!isGameOver()) {
+            // Move to next hand or play for dealer
+            if (activeHandIndex === 0) {
+                activeHandIndex = 1;
+                visualizeSplitHands();
+            } else {
+                playForDealer();
+            }
+        }
+    } else {
+        hit();
+        if (!isGameOver()) {
+            playForDealer();
+        }
     }
 }
 
 function isGameOver() {
-    return !!document.getElementById('result').textContent;
+    const resultElement = document.getElementById('result');
+    if (resultElement && resultElement.textContent) {
+        return true;
+    }
+    
+    if (splitHands.length > 0) {
+        // Check all split hands for bust or blackjack
+        for (const hand of splitHands) {
+            const handTotal = calculateTotal(hand.map(card => card[0]));
+            if (handTotal.hardValue > 21 && (handTotal.softValue > 21 || handTotal.softValue == null)) {
+                return true;
+            }
+            if (handTotal.hardValue === 21 && hand.length === 2) {
+                return true;
+            }
+        }
+    } else {
+        // Check for player bust
+        let playerTotal = calculateTotal(getCardValuesFromPlayerHand());
+        if (playerTotal.hardValue > 21 && (playerTotal.softValue > 21 || playerTotal.softValue == null)) {
+            return true;
+        }
+        
+        // Check for blackjack
+        if (playerTotal.hardValue === 21 && getCardValuesFromPlayerHand().length === 2) {
+            return true;
+        }
+    }
+    
+    // Check for dealer blackjack
+    let dealerTotal = calculateTotal(getCardValuesFromDealerHand());
+    if (dealerTotal.hardValue === 21 && getCardValuesFromDealerHand().length === 2) {
+        return true;
+    }
+    
+    return false;
 }
 
 function restartGame() {
@@ -285,25 +411,42 @@ function playForDealer() {
 
     visualizeDealerHandAndTotal();
 
-    // check for result
-    finalDealerHard = calculateTotal(getCardValuesFromDealerHand()).hardValue;
-    finalDealerSoft = calculateTotal(getCardValuesFromDealerHand()).softValue; 
-    let finalDealerTotal = getTrueHandValue(finalDealerHard, finalDealerSoft);
-
-
-    finalPlayerHard = calculateTotal(getCardValuesFromPlayerHand()).hardValue;
-    finalPlayerSoft = calculateTotal(getCardValuesFromPlayerHand()).softValue; 
-    let finalPlayerTotal = getTrueHandValue(finalPlayerHard, finalPlayerSoft);
-
-
-    if (finalDealerTotal > 21) {
-        playerWins();
-    } else if (finalDealerTotal > finalPlayerTotal) {
-        playerLoses();
-    } else if (finalPlayerTotal > finalDealerTotal) {
-        playerWins();
+    if (splitHands.length > 0) {
+        // Evaluate all split hands against dealer
+        for (const hand of splitHands) {
+            const handTotal = calculateTotal(hand.map(card => card[0]));
+            const finalHandTotal = getTrueHandValue(handTotal.hardValue, handTotal.softValue);
+            
+            const dealerTotal = calculateTotal(getCardValuesFromDealerHand());
+            const finalDealerTotal = getTrueHandValue(dealerTotal.hardValue, dealerTotal.softValue);
+            
+            if (finalDealerTotal > 21) {
+                playerWins();
+            } else if (finalDealerTotal > finalHandTotal) {
+                playerLoses();
+            } else if (finalHandTotal > finalDealerTotal) {
+                playerWins();
+            } else {
+                playerDraws();
+            }
+        }
     } else {
-        playerDraws();
+        // check for result
+        const dealerTotal = calculateTotal(getCardValuesFromDealerHand());
+        const finalDealerTotal = getTrueHandValue(dealerTotal.hardValue, dealerTotal.softValue);
+
+        const playerTotal = calculateTotal(getCardValuesFromPlayerHand());
+        const finalPlayerTotal = getTrueHandValue(playerTotal.hardValue, playerTotal.softValue);
+
+        if (finalDealerTotal > 21) {
+            playerWins();
+        } else if (finalDealerTotal > finalPlayerTotal) {
+            playerLoses();
+        } else if (finalPlayerTotal > finalDealerTotal) {
+            playerWins();
+        } else {
+            playerDraws();
+        }
     }
 
 }
