@@ -217,7 +217,29 @@ function doubleDown() {
 }
 
 function isGameOver() {
-    return !!document.getElementById('result').textContent;
+    const resultElement = document.getElementById('result');
+    if (resultElement && resultElement.textContent) {
+        return true;
+    }
+    
+    // Check for player bust
+    let playerTotal = calculateTotal(getCardValuesFromPlayerHand());
+    if (playerTotal.hardValue > 21 && (playerTotal.softValue > 21 || playerTotal.softValue == null)) {
+        return true;
+    }
+    
+    // Check for blackjack
+    if (playerTotal.hardValue === 21 && getCardValuesFromPlayerHand().length === 2) {
+        return true;
+    }
+    
+    // Check for dealer blackjack
+    let dealerTotal = calculateTotal(getCardValuesFromDealerHand());
+    if (dealerTotal.hardValue === 21 && getCardValuesFromDealerHand().length === 2) {
+        return true;
+    }
+    
+    return false;
 }
 
 function restartGame() {
