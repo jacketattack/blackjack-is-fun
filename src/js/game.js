@@ -210,10 +210,11 @@ function disableDoubleDown() {
 
 function doubleDown() {
     hit();
-    // TODO: bug is here.. do not play for dealer if game is over
-    if (!isGameOver()) {
-        playForDealer();
+    // Check if the game is over after hitting (e.g., player busts)
+    if (isGameOver()) {
+        return;
     }
+    playForDealer();
 }
 
 function isGameOver() {
