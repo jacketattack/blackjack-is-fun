@@ -1,10 +1,14 @@
 var dealerHand;
 var playerHand;
+var splitHands = [];
+var currentHandIndex = 0;
 
 function startGame() {
     // assume one player for now
     dealerHand = dealStartingHand();
     playerHand = dealStartingHand();
+    splitHands = [];
+    currentHandIndex = 0;
 
     performSetupBeforePlayerDecision();
 }
@@ -54,25 +58,70 @@ function split() {
     const hand1 = [playerHand[0], dealOneCard()];
     const hand2 = [playerHand[1], dealOneCard()];
 
-    // Store the original hand and set the first split hand as active
-    playerHand = hand1;
+    // Store both hands in the splitHands array
+    splitHands = [hand1, hand2];
+    currentHandIndex = 0;
+    playerHand = splitHands[currentHandIndex];
+    
     visualizePlayerHandAndTotal();
-
-    // Visual indicators for split hands
-    const playerHandElement = document.getElementById('visualPlayerHand');
-    playerHandElement.innerHTML = `
-        <div class="active-hand">${stringifyHand(hand1)}</div>
-        <div class="inactive-hand">${stringifyHand(hand2)}</div>
-    `;
+    displayAllHands();
 
     // Tooltip for split action
-    const splitTooltip = document.createElement('div');
-    splitTooltip.className = 'tooltip';
-    splitTooltip.textContent = 'Playing first hand. Click "Switch Hand" to play the second hand.';
-    playerHandElement.appendChild(splitTooltip);
+    addSplitTooltip();
 
     // Allow resplitting if another pair is dealt
     enableSplitIfPlayerHasPair();
+}
+
+function displayAllHands() {
+    const playerHandElement = document.getElementById('visualPlayerHand');
+    let html = '';
+    
+    if (splitHands.length > 0) {
+        splitHands.forEach((hand, index) => {
+            const handClass = index === currentHandIndex ? 'active-hand' : 'inactive-hand';
+            html += `<div class="${handClass}" data-hand-index="${index}" style="cursor: pointer;">${stringifyHand(hand)}</div>`;
+        });
+    } else {
+        // No split hands, just show the player hand normally
+        html = stringifyHand(playerHand);
+    }
+    
+    playerHandElement.innerHTML = html;
+    
+    // Add click handlers to switch hands
+    if (splitHands.length > 0) {
+        playerHandElement.querySelectorAll('[data-hand-index]').forEach(handElement => {
+            handElement.addEventListener('click', () => {
+                const handIndex = parseInt(handElement.dataset.handIndex);
+                switchToHand(handIndex);
+            });
+        });
+    }
+}
+
+function switchToHand(handIndex) {
+    if (handIndex >= 0 && handIndex < splitHands.length && handIndex !== currentHandIndex) {
+        currentHandIndex = handIndex;
+        playerHand = splitHands[currentHandIndex];
+        visualizePlayerHandAndTotal();
+        displayAllHands();
+        enableSplitIfPlayerHasPair();
+    }
+}
+
+function addSplitTooltip() {
+    const playerHandElement = document.getElementById('visualPlayerHand');
+    // Remove existing tooltip if any
+    const existingTooltip = playerHandElement.querySelector('.tooltip');
+    if (existingTooltip) {
+        existingTooltip.remove();
+    }
+    
+    const tooltip = document.createElement('div');
+    tooltip.className = 'tooltip';
+    tooltip.textContent = `Playing hand ${currentHandIndex + 1} of ${splitHands.length}. Click on other hands to switch.`;
+    playerHandElement.appendChild(tooltip);
 }
 
 function dealOneCard() {
@@ -108,8 +157,11 @@ function getCardValuesFromPlayerHand() {
 }
 
 function visualizePlayerHandAndTotal() {
-    document.getElementById('visualPlayerHand').textContent = stringifyHand(playerHand);
-
+    // If split hands are active, don't overwrite the HTML (displayAllHands handles this)
+    if (splitHands.length === 0) {
+        document.getElementById('visualPlayerHand').textContent = stringifyHand(playerHand);
+    }
+    
     document.getElementById('playerTotal').textContent = getVisualTotal(getCardValuesFromPlayerHand());
 }
 
@@ -361,9 +413,18 @@ module.exports = {
     visualizeDealerHandAndTotal,
     calculateTotal,
     getCardValuesFromPlayerHand,
+    split,
+    switchToHand,
+    dealOneCard,
+    displayAllHands,
+    stringifyHand,
     // For testing
     get playerHand() { return playerHand; },
     set playerHand(hand) { playerHand = hand; },
+    get splitHands() { return splitHands; },
+    set splitHands(hands) { splitHands = hands; },
+    get currentHandIndex() { return currentHandIndex; },
+    set currentHandIndex(index) { currentHandIndex = index; },
 };
 
 // Only start the game if not in a test environment
