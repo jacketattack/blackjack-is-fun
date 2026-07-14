@@ -220,7 +220,8 @@ function hit(){
 
 function checkForPlayerBust() {
     let playerTotal = calculateTotal(getCardValuesFromPlayerHand());
-    if (playerTotal.hardValue > 21 && (playerTotal.softValue > 21 || playerTotal.softValue == null) ){
+    let trueTotal = getTrueHandValue(playerTotal.hardValue, playerTotal.softValue);
+    if (trueTotal > 21) {
         visualizeDealerHandAndTotal();
         playerLoses();
     }
@@ -354,6 +355,18 @@ module.exports = {
     playerWins,
     restartGame,
     playForDealer,
+    checkForPlayerBust,
+    getTrueHandValue,
+    startGame,
+    visualizeDealerHandAndTotal,
+    calculateTotal,
+    getCardValuesFromPlayerHand,
+    // For testing
+    get playerHand() { return playerHand; },
+    set playerHand(hand) { playerHand = hand; },
 };
 
-startGame();
+// Only start the game if not in a test environment
+if (process.env.NODE_ENV !== 'test') {
+    startGame();
+}
