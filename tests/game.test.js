@@ -31,8 +31,12 @@ describe('Blackjack Game Logic', () => {
             <button id="double-down" disabled></button>
             <button id="restart-game" class="hidden"></button>
         `;
+        // Mock card dealing to prevent dealer from getting blackjack
+        global.dealOneCard = jest.fn(() => ['2', 'hearts']);
         // Reset the game state
         gameModule.restartGame();
+        // Clean up mocks
+        jest.clearAllMocks();
     });
 
     test('isGameOver returns true if the game is over', () => {

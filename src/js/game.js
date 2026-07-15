@@ -361,6 +361,7 @@ module.exports = {
     visualizeDealerHandAndTotal,
     calculateTotal,
     getCardValuesFromPlayerHand,
+    split,
     // For testing
     get playerHand() { return playerHand; },
     set playerHand(hand) { playerHand = hand; },
