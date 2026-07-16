@@ -1,14 +1,14 @@
 var dealerHand;
-var playerHand;
-var splitHands = [];
-var currentHandIndex = 0;
+var playerHands = []; // Array to store multiple hands when splitting
+var activeHandIndex = 0; // Index of the currently active hand
+var isSplitMode = false; // Flag to indicate if we're in split mode
 
 function startGame() {
     // assume one player for now
     dealerHand = dealStartingHand();
-    playerHand = dealStartingHand();
-    splitHands = [];
-    currentHandIndex = 0;
+    playerHands = [dealStartingHand()]; // Start with one hand
+    activeHandIndex = 0;
+    isSplitMode = false;
 
     performSetupBeforePlayerDecision();
 }
@@ -17,7 +17,7 @@ const suits = ['hearts', 'diamonds', 'spades', 'clubs'];
 const cardValues = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'];
 
 function performSetupBeforePlayerDecision() {
-    visualizePlayerHandAndTotal();
+    visualizePlayerHandsAndTotals();
 
     let currentDealerTotal = calculateTotal(getCardValuesFromDealerHand());
     if (currentDealerTotal.hardValue === 21) {
@@ -32,96 +32,78 @@ function performSetupBeforePlayerDecision() {
 }
 
 function enableSplitIfPlayerHasPair() {
-    const firstCardValue = convertCardValueToBlackjackValue(playerHand[0][0]);
-    const secondCardValue = convertCardValueToBlackjackValue(playerHand[1][0]);
+    const activeHand = getActiveHand();
+    if (activeHand && activeHand.cards && activeHand.cards.length === 2) {
+        const firstCardValue = convertCardValueToBlackjackValue(activeHand.cards[0][0]);
+        const secondCardValue = convertCardValueToBlackjackValue(activeHand.cards[1][0]);
 
-    if (firstCardValue === secondCardValue) {
-        enableSplitAction();
+        if (firstCardValue === secondCardValue) {
+            enableSplitAction();
+        }
     }
 }
 
 function enableSplitAction() {
-    document.getElementById('split').removeAttribute('disabled');
+    const splitButton = document.getElementById('split');
+    if (splitButton) {
+        splitButton.removeAttribute('disabled');
+    }
 }
 
 function split() {
-    // Check if the player has a pair
-    const firstCardValue = convertCardValueToBlackjackValue(playerHand[0][0]);
-    const secondCardValue = convertCardValueToBlackjackValue(playerHand[1][0]);
+    const activeHand = getActiveHand();
+    
+    // Check if the player has a pair in the active hand
+    if (!activeHand || activeHand.cards.length !== 2) {
+        console.log('Cannot split: Hand does not have exactly 2 cards');
+        return;
+    }
+
+    const firstCardValue = convertCardValueToBlackjackValue(activeHand.cards[0][0]);
+    const secondCardValue = convertCardValueToBlackjackValue(activeHand.cards[1][0]);
 
     if (firstCardValue !== secondCardValue) {
         console.log('Cannot split: Not a pair');
         return;
     }
 
-    // Create two new hands
-    const hand1 = [playerHand[0], dealOneCard()];
-    const hand2 = [playerHand[1], dealOneCard()];
-
-    // Store both hands in the splitHands array
-    splitHands = [hand1, hand2];
-    currentHandIndex = 0;
-    playerHand = splitHands[currentHandIndex];
+    // Create two new hands from the split
+    const card1 = activeHand.cards[0];
+    const card2 = activeHand.cards[1];
     
-    visualizePlayerHandAndTotal();
-    displayAllHands();
+    const hand1 = {
+        cards: [card1, dealOneCard()],
+        finished: false
+    };
+    const hand2 = {
+        cards: [card2, dealOneCard()],
+        finished: false
+    };
 
-    // Tooltip for split action
-    addSplitTooltip();
+    // Replace the active hand with the first split hand
+    playerHands[activeHandIndex] = hand1;
+    
+    // Add the second hand to the array
+    playerHands.push(hand2);
+    
+    // Set up split mode
+    isSplitMode = true;
+    activeHandIndex = 0; // Start with the first hand
 
-    // Allow resplitting if another pair is dealt
+    // Visualize all hands with active/inactive indicators
+    visualizePlayerHandsAndTotals();
+    
+    // Add switch hand button if it doesn't exist
+    addSwitchHandButton();
+    
+    // Add tooltip for split hands
+    addSplitTooltips();
+    
+    // Allow resplitting if the new active hand has a pair
     enableSplitIfPlayerHasPair();
-}
-
-function displayAllHands() {
-    const playerHandElement = document.getElementById('visualPlayerHand');
-    let html = '';
     
-    if (splitHands.length > 0) {
-        splitHands.forEach((hand, index) => {
-            const handClass = index === currentHandIndex ? 'active-hand' : 'inactive-hand';
-            html += `<div class="${handClass}" data-hand-index="${index}" style="cursor: pointer;">${stringifyHand(hand)}</div>`;
-        });
-    } else {
-        // No split hands, just show the player hand normally
-        html = stringifyHand(playerHand);
-    }
-    
-    playerHandElement.innerHTML = html;
-    
-    // Add click handlers to switch hands
-    if (splitHands.length > 0) {
-        playerHandElement.querySelectorAll('[data-hand-index]').forEach(handElement => {
-            handElement.addEventListener('click', () => {
-                const handIndex = parseInt(handElement.dataset.handIndex);
-                switchToHand(handIndex);
-            });
-        });
-    }
-}
-
-function switchToHand(handIndex) {
-    if (handIndex >= 0 && handIndex < splitHands.length && handIndex !== currentHandIndex) {
-        currentHandIndex = handIndex;
-        playerHand = splitHands[currentHandIndex];
-        visualizePlayerHandAndTotal();
-        displayAllHands();
-        enableSplitIfPlayerHasPair();
-    }
-}
-
-function addSplitTooltip() {
-    const playerHandElement = document.getElementById('visualPlayerHand');
-    // Remove existing tooltip if any
-    const existingTooltip = playerHandElement.querySelector('.tooltip');
-    if (existingTooltip) {
-        existingTooltip.remove();
-    }
-    
-    const tooltip = document.createElement('div');
-    tooltip.className = 'tooltip';
-    tooltip.textContent = `Playing hand ${currentHandIndex + 1} of ${splitHands.length}. Click on other hands to switch.`;
-    playerHandElement.appendChild(tooltip);
+    // Disable split button for non-active hands
+    updateSplitButtonState();
 }
 
 function dealOneCard() {
@@ -133,36 +115,77 @@ function dealOneCard() {
 
 function dealStartingHand() {
     // return 2 cards
-    return [dealOneCard(), dealOneCard()];
+    return {
+        cards: [dealOneCard(), dealOneCard()],
+        finished: false
+    };
 }
 
 function displayDealerStartingHand() {
-    document.getElementById('visualDealerHand').textContent = `${stringifyHand([dealerHand[0]])} + ??`;
+    document.getElementById('visualDealerHand').textContent = `${stringifyHand([dealerHand.cards[0]])} + ??`;
 
     document.getElementById('dealerTotal').textContent = '??';
 }
 
 function visualizeDealerHandAndTotal() {
-    document.getElementById('visualDealerHand').textContent = stringifyHand(dealerHand);
+    document.getElementById('visualDealerHand').textContent = stringifyHand(dealerHand.cards);
 
     document.getElementById('dealerTotal').textContent = getVisualTotal(getCardValuesFromDealerHand());
 }
 
 function getCardValuesFromDealerHand() {
-    return dealerHand.map((cardData) => cardData[0]);
+    return dealerHand.cards.map((cardData) => cardData[0]);
 }
 
 function getCardValuesFromPlayerHand() {
-    return playerHand.map((cardData) => cardData[0]);
+    // Backward compatibility - return values from active hand
+    const activeHand = getActiveHand();
+    return activeHand ? activeHand.cards.map((cardData) => cardData[0]) : [];
+}
+
+function getCardValuesFromHand(handCards) {
+    return handCards.map((cardData) => cardData[0]);
+}
+
+function visualizePlayerHandsAndTotals() {
+    const playerHandElement = document.getElementById('visualPlayerHand');
+    const playerTotalElement = document.getElementById('playerTotal');
+    
+    if (!playerHandElement) return;
+
+    if (isSplitMode && playerHands.length > 1) {
+        // Show all hands with active/inactive indicators
+        let handsHTML = '';
+        playerHands.forEach((hand, index) => {
+            const handClass = index === activeHandIndex ? 'active-hand' : 'inactive-hand';
+            handsHTML += `<div class="${handClass}">${stringifyHand(hand.cards)}</div>`;
+        });
+        playerHandElement.innerHTML = handsHTML;
+        
+        // Show total for active hand
+        const activeHand = getActiveHand();
+        if (activeHand) {
+            playerTotalElement.textContent = getVisualTotal(getCardValuesFromHand(activeHand.cards));
+        }
+    } else {
+        // Single hand mode - backward compatibility
+        const primaryHand = playerHands.length > 0 ? playerHands[0].cards : [];
+        playerHandElement.textContent = stringifyHand(primaryHand);
+        playerTotalElement.textContent = getVisualTotal(getCardValuesFromHand(primaryHand));
+    }
 }
 
 function visualizePlayerHandAndTotal() {
-    // If split hands are active, don't overwrite the HTML (displayAllHands handles this)
-    if (splitHands.length === 0) {
-        document.getElementById('visualPlayerHand').textContent = stringifyHand(playerHand);
+    // Backward compatibility - visualize the first hand only
+    const primaryHand = playerHands.length > 0 ? playerHands[0].cards : [];
+    const playerHandElement = document.getElementById('visualPlayerHand');
+    const playerTotalElement = document.getElementById('playerTotal');
+    if (playerHandElement) {
+        playerHandElement.textContent = stringifyHand(primaryHand);
     }
-    
-    document.getElementById('playerTotal').textContent = getVisualTotal(getCardValuesFromPlayerHand());
+    if (playerTotalElement) {
+        playerTotalElement.textContent = getVisualTotal(getCardValuesFromHand(primaryHand));
+    }
 }
 
 function getVisualTotal(cardValues) {
@@ -227,7 +250,7 @@ function calculateTotal(cardValues) {
         hardTotal += 10;
     }
 
-    // Calculate 
+    // Calculate  
 
     /**
      * loop to calculate hard Total
@@ -236,6 +259,7 @@ function calculateTotal(cardValues) {
      * 
      * loop to calculate soft Total
      * Assume all aces are 1s
+     * 
      */
 
 
@@ -263,11 +287,13 @@ function convertCardValueToBlackjackValue(cardValue) {
 }
 
 function hit(){
-    playerHand.push(dealOneCard());
-    visualizePlayerHandAndTotal();
-    disableDoubleDown();
-
-    checkForPlayerBust();
+    const activeHand = getActiveHand();
+    if (activeHand) {
+        activeHand.cards.push(dealOneCard());
+        visualizePlayerHandsAndTotals();
+        disableDoubleDown();
+        checkForPlayerBust();
+    }
 }
 
 function checkForPlayerBust() {
@@ -359,7 +385,7 @@ function playForDealer() {
     while (currentDealerTotal.hardValue < 17 || (currentDealerTotal.softValue != null && currentDealerTotal.softValue < 17)) {
         let newCard = dealOneCard();
         console.log('%cDEALER_DRAWS ' + newCard[0], "color: red; font-size: 20px");
-        dealerHand.push(newCard);
+        dealerHand.cards.push(newCard);
         currentDealerTotal = calculateTotal(getCardValuesFromDealerHand());
     }
 
@@ -369,7 +395,6 @@ function playForDealer() {
     finalDealerHard = calculateTotal(getCardValuesFromDealerHand()).hardValue;
     finalDealerSoft = calculateTotal(getCardValuesFromDealerHand()).softValue; 
     let finalDealerTotal = getTrueHandValue(finalDealerHard, finalDealerSoft);
-
 
     finalPlayerHard = calculateTotal(getCardValuesFromPlayerHand()).hardValue;
     finalPlayerSoft = calculateTotal(getCardValuesFromPlayerHand()).softValue; 
@@ -400,6 +425,52 @@ function enableActionButtons() {
     }
 }
 
+function getActiveHand() {
+    return playerHands.length > 0 ? playerHands[activeHandIndex] : null;
+}
+
+function switchToHand(handIndex) {
+    if (handIndex >= 0 && handIndex < playerHands.length && handIndex !== activeHandIndex) {
+        activeHandIndex = handIndex;
+        visualizePlayerHandsAndTotals();
+        enableSplitIfPlayerHasPair();
+    }
+}
+
+function addSwitchHandButton() {
+    // No-op: Click handlers are added in displayAllHands
+}
+
+function addSplitTooltips() {
+    const playerHandElement = document.getElementById('visualPlayerHand');
+    // Remove existing tooltip if any
+    const existingTooltip = playerHandElement.querySelector('.tooltip');
+    if (existingTooltip) {
+        existingTooltip.remove();
+    }
+    
+    const tooltip = document.createElement('div');
+    tooltip.className = 'tooltip';
+    tooltip.textContent = `Playing hand ${activeHandIndex + 1} of ${playerHands.length}. Click on other hands to switch.`;
+    playerHandElement.appendChild(tooltip);
+}
+
+function updateSplitButtonState() {
+    const splitButton = document.getElementById('split');
+    if (splitButton) {
+        const activeHand = getActiveHand();
+        if (activeHand && activeHand.cards.length === 2) {
+            const firstCardValue = convertCardValueToBlackjackValue(activeHand.cards[0][0]);
+            const secondCardValue = convertCardValueToBlackjackValue(activeHand.cards[1][0]);
+            if (firstCardValue === secondCardValue) {
+                splitButton.removeAttribute('disabled');
+                return;
+            }
+        }
+        splitButton.setAttribute('disabled', true);
+    }
+}
+
 module.exports = {
     doubleDown,
     isGameOver,
@@ -418,13 +489,14 @@ module.exports = {
     dealOneCard,
     displayAllHands,
     stringifyHand,
+    visualizePlayerHandsAndTotals,
     // For testing
-    get playerHand() { return playerHand; },
-    set playerHand(hand) { playerHand = hand; },
-    get splitHands() { return splitHands; },
-    set splitHands(hands) { splitHands = hands; },
-    get currentHandIndex() { return currentHandIndex; },
-    set currentHandIndex(index) { currentHandIndex = index; },
+    get playerHands() { return playerHands; },
+    set playerHands(hands) { playerHands = hands; },
+    get activeHandIndex() { return activeHandIndex; },
+    set activeHandIndex(index) { activeHandIndex = index; },
+    get isSplitMode() { return isSplitMode; },
+    set isSplitMode(mode) { isSplitMode = mode; }
 };
 
 // Only start the game if not in a test environment
