@@ -56,7 +56,11 @@ describe('Blackjack Game Logic', () => {
     describe('checkForPlayerBust', () => {
         test('correctly identifies bust with hard total > 21', () => {
             // Set player hand to have a hard total > 21
-            gameModule.playerHand = [['K', 'hearts'], ['Q', 'diamonds'], ['2', 'spades']]; // K=10, Q=10, 2=2 = 22
+            gameModule.playerHands = [{
+                cards: [['K', 'hearts'], ['Q', 'diamonds'], ['2', 'spades']],
+                finished: false
+            }]; // K=10, Q=10, 2=2 = 22
+            gameModule.activeHandIndex = 0;
             
             // Call checkForPlayerBust
             gameModule.checkForPlayerBust();
@@ -69,7 +73,11 @@ describe('Blackjack Game Logic', () => {
             // Set player hand: Ace + King + King + 2
             // hard = 1 + 10 + 10 + 2 = 23, soft = 11 + 10 + 10 + 2 = 33
             // getTrueHandValue should use soft (33) since hard >= 22, so it IS a bust
-            gameModule.playerHand = [['A', 'hearts'], ['K', 'diamonds'], ['K', 'spades'], ['2', 'clubs']];
+            gameModule.playerHands = [{
+                cards: [['A', 'hearts'], ['K', 'diamonds'], ['K', 'spades'], ['2', 'clubs']],
+                finished: false
+            }];
+            gameModule.activeHandIndex = 0;
             
             // Call checkForPlayerBust
             gameModule.checkForPlayerBust();
@@ -80,7 +88,11 @@ describe('Blackjack Game Logic', () => {
 
         test('does not call playerLoses for valid hand', () => {
             // Set player hand to a valid total
-            gameModule.playerHand = [['10', 'hearts'], ['5', 'diamonds']]; // 15
+            gameModule.playerHands = [{
+                cards: [['10', 'hearts'], ['5', 'diamonds']],
+                finished: false
+            }]; // 15
+            gameModule.activeHandIndex = 0;
             const playerLosesSpy = jest.spyOn(gameModule, 'playerLoses');
             
             gameModule.checkForPlayerBust();
@@ -94,7 +106,11 @@ describe('Blackjack Game Logic', () => {
             // Set player hand: Ace + King + 5
             // hard = 1 + 10 + 5 = 16, soft = 11 + 10 + 5 = 26
             // getTrueHandValue should use hard (16) since hard < 22, so NOT a bust
-            gameModule.playerHand = [['A', 'hearts'], ['K', 'diamonds'], ['5', 'spades']];
+            gameModule.playerHands = [{
+                cards: [['A', 'hearts'], ['K', 'diamonds'], ['5', 'spades']],
+                finished: false
+            }];
+            gameModule.activeHandIndex = 0;
             const playerLosesSpy = jest.spyOn(gameModule, 'playerLoses');
             
             gameModule.checkForPlayerBust();
