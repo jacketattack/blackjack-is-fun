@@ -9,6 +9,14 @@
     display: none; /* Hide player name to match table inspiration */
 }
 
+.bankroll,
+.bet {
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin: 5px 0;
+    color: white;
+}
+
 .hands {
     display: flex;
     justify-content: center;

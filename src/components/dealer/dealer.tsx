@@ -27,9 +27,10 @@ export const Dealer = (props: DealerProps) => {
         if (
             hasPlayerFinishedPlaying() &&
             !hasPlayerBusted() &&
-            !dealerState.blackjackHand.finished
+            !dealerState.blackjackHand.finished &&
+            !isPushScenario()
         ) {
-            // Dealer plays out hand if player has finished and hasn't busted
+            // Dealer plays out hand if player has finished, hasn't busted, and no push
             const dealerFinalHand: Card[] = playDealerHand(
                 dealerState.blackjackHand.cards
             )
@@ -50,8 +51,20 @@ export const Dealer = (props: DealerProps) => {
         ) {
             // Dealer has blackjack or 21 on deal, and player hasn't finished yet
             props.onHasFinishedPlaying(dealerState.blackjackHand.cards)
+        } else if (hasPlayerFinishedPlaying() && isPushScenario()) {
+            // Push scenario: dealer does not play
+            props.onHasFinishedPlaying(dealerState.blackjackHand.cards)
         }
     }, [props.playerFinalTotals])
+
+    function isPushScenario(): boolean {
+        const dealerTotal = calculateHandOfCardsTotal(
+            dealerState.blackjackHand.cards
+        ).total
+        return props.playerFinalTotals.some(
+            (playerTotal) => playerTotal === dealerTotal
+        )
+    }
 
     function isDealerOpeningHand(): boolean {
         return (

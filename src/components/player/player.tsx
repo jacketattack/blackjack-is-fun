@@ -20,6 +20,8 @@ interface PlayerProps {
 interface PlayerState {
     blackjackHands: BlackjackHand[]
     activeHandIndex: number
+    bankroll: number
+    bet: number
 }
 
 export const Player = (props: PlayerProps) => {
@@ -29,6 +31,8 @@ export const Player = (props: PlayerProps) => {
     ] = useState({
         blackjackHands: [dealHand()],
         activeHandIndex: 0,
+        bankroll: 1000, // Starting bankroll
+        bet: 10, // Default bet per hand
     })
 
     useEffect(() => {
@@ -42,6 +46,32 @@ export const Player = (props: PlayerProps) => {
             props.onHasFinishedActions(finishedHands)
         }
     }, [props.dealerHand])
+
+    useEffect(() => {
+        if (playerIsFinished()) {
+            const dealerTotal = dealerHandTotal.total
+            const playerHands = playerState.blackjackHands
+            let newBankroll = playerState.bankroll
+
+            playerHands.forEach((hand) => {
+                const playerTotal = calculateHandOfCardsTotal(hand.cards).total
+                if (playerTotal > 21) {
+                    newBankroll -= playerState.bet // Player loses bet
+                } else if (dealerTotal > 21) {
+                    newBankroll += playerState.bet // Player wins bet
+                } else if (playerTotal > dealerTotal) {
+                    newBankroll += playerState.bet // Player wins bet
+                } else if (playerTotal < dealerTotal) {
+                    newBankroll -= playerState.bet // Player loses bet
+                } // Push: bet is returned
+            })
+
+            setPlayerState((prevState) => ({
+                ...prevState,
+                bankroll: newBankroll,
+            }))
+        }
+    }, [playerState.blackjackHands, props.dealerHand])
 
     const dealerHandTotal: CardTotal = useHandOfCardsTotal(props.dealerHand)
 
@@ -169,6 +199,10 @@ export const Player = (props: PlayerProps) => {
     return (
         <div className={styles.player}>
             <div className={styles.name}>{props.name}</div>
+            <div className={styles.bankroll}>
+                Bankroll: ${playerState.bankroll}
+            </div>
+            <div className={styles.bet}>Bet: ${playerState.bet}</div>
             <div className={styles.hands}>
                 {playerState.blackjackHands.map(
                     (hand: BlackjackHand, index: number) => (

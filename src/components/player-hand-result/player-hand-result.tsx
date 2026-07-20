@@ -42,11 +42,7 @@ export const PlayerHandResult = (props: PlayerHandResultProps) => {
         dealerFinalTotal: number,
         playerFinalTotal: number
     ): boolean {
-        return (
-            !!dealerFinalTotal &&
-            dealerFinalTotal < 22 &&
-            dealerFinalTotal === playerFinalTotal
-        )
+        return !!dealerFinalTotal && dealerFinalTotal === playerFinalTotal
     }
 
     return (

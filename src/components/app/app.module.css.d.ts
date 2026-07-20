@@ -1,6 +1,9 @@
 declare const styles: {
   readonly "game": string;
-  readonly "player": string;
+  readonly "tableMarkings": string;
+  readonly "blackjackPays": string;
+  readonly "dealerRules": string;
+  readonly "insurancePays": string;
 };
 export = styles;
 
