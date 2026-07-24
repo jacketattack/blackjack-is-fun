@@ -461,7 +461,62 @@ describe('Split Functionality', () => {
         });
     });
 
-    describe('Helper Functions', () => {
+    describe('Double Down Function', () => {
+    beforeEach(() => {
+        game.playerHands = [{
+            cards: [['9', 'hearts'], ['8', 'diamonds']],
+            finished: false
+        }];
+        game.activeHandIndex = 0;
+        game.isSplitMode = false;
+        dealerHand = {
+            cards: [['10', 'hearts'], ['5', 'diamonds']]
+        };
+
+        // Mock DOM elements to avoid errors
+        mockElements['result'] = {
+            textContent: ''
+        };
+        mockElements['visualDealerHand'] = {
+            textContent: ''
+        };
+        mockElements['dealerTotal'] = {
+            textContent: ''
+        };
+        mockElements['visualPlayerHand'] = {
+            innerHTML: '',
+            textContent: ''
+        };
+        mockElements['playerTotal'] = {
+            textContent: ''
+        };
+    });
+
+    test('should not call playForDealer if game is over after doubling down', () => {
+        // Mock isGameOver to return true after the first call
+        jest.spyOn(game, 'isGameOver').mockReturnValueOnce(false).mockReturnValueOnce(true);
+        jest.spyOn(game, 'playForDealer').mockImplementation(() => {});
+
+        game.doubleDown();
+
+        expect(game.playForDealer).not.toHaveBeenCalled();
+    });
+
+    test('should call playForDealer if game is not over after doubling down', () => {
+        // Mock isGameOver to always return false
+        jest.spyOn(game, 'isGameOver').mockReturnValue(false);
+        jest.spyOn(game, 'dealOneCard').mockReturnValue(['2', 'spades']);
+
+        // Spy on playForDealer to verify it is called
+        const playForDealerSpy = jest.spyOn(game, 'playForDealer').mockImplementation(() => {});
+
+        game.doubleDown();
+
+        expect(playForDealerSpy).toHaveBeenCalled();
+    });
+});
+
+describe('Helper Functions', () => {
         it('should get card values from hand', () => {
             const hand = [['10', 'hearts'], ['5', 'diamonds']];
             const values = game.getCardValuesFromHand(hand);
