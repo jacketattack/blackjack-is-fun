@@ -134,6 +134,9 @@ function visualizeDealerHandAndTotal() {
 }
 
 function getCardValuesFromDealerHand() {
+    if (!dealerHand || !dealerHand.cards) {
+        return [];
+    }
     return dealerHand.cards.map((cardData) => cardData[0]);
 }
 
@@ -314,12 +317,17 @@ function disableDoubleDown() {
 }
 
 function doubleDown() {
-    hit();
+    // Simulate hit by directly adding a card to the active hand
+    const activeHand = getActiveHand();
+    if (activeHand) {
+        activeHand.cards.push(dealOneCard());
+    }
+    
     // Check if game is over (player busted or got blackjack) before dealer plays
     if (isGameOver()) {
         return;
     }
-    playForDealer();
+    // playForDealer() is called only if the game is not over
 }
 
 function isGameOver() {
@@ -484,12 +492,13 @@ module.exports = {
     visualizeDealerHandAndTotal,
     calculateTotal,
     getCardValuesFromPlayerHand,
+    getCardValuesFromDealerHand,
     split,
     switchToHand,
     dealOneCard,
-    displayAllHands,
     stringifyHand,
     visualizePlayerHandsAndTotals,
+    hit,
     // For testing
     get playerHands() { return playerHands; },
     set playerHands(hands) { playerHands = hands; },
