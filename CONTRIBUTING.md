@@ -49,7 +49,7 @@ This project has a variety of dependencies required to run. This section will ac
 
 ### Submitting an Issue
 
-We use github's [issue tracker](https://github.com/jacketattack/blackjack-is-fun/issues) to contain bug reports and feature/enhancement requests. Before submitting an issue, search to ensure that there are no similar issues. When raising an issue, follow the [issues styleguide](#issues).
+We use github's [issue tracker](https://github.com/jacketattack/blackjack-is-fun/issues) to contain bug reports and feature/enhancement requests. Before submitting an issue, search to ensure that there are no similar issues. When raising an issue, please use one of our [issue templates](/.github/ISSUE_TEMPLATE/) to ensure all necessary information is provided. Follow the [issues styleguide](#issues) for additional guidance.
 
 ### Your First Contribution
 
