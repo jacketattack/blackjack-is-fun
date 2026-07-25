@@ -1,3 +1,4 @@
+import * as React from 'react';
 import { BlackjackHand, Card } from '../../interfaces/card.interface'
 import { CardImage } from '../card-image/card-image'
 import { CardTotalDisplay } from '../card-total-display/card-total-display'

@@ -1,4 +1,5 @@
 import classNames from "classnames";
+import * as React from 'react';
 import { Card } from "../../interfaces/card.interface";
 import * as styles from './player-actions.module.css';
 

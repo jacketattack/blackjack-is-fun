@@ -5,7 +5,7 @@ import {
     createHandHistoryEntry,
     HandOutcome,
 } from './handHistory'
-import { Card, CardSuit, CardValue } from '../interfaces/card.interface'
+import { CardSuit, CardValue } from '../interfaces/card.interface'
 
 describe('Hand History Service', () => {
     beforeEach(() => {

@@ -1,7 +1,8 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen } from '@testing-library/react';
+import * as React from 'react';
 import '@testing-library/jest-dom'
 import { DeckStatus } from './deck-status'
-import { resetShoe, drawCard } from '../../services/deck'
+import { resetShoe } from '../../services/deck'
 
 describe('DeckStatus Component', () => {
     beforeEach(() => {

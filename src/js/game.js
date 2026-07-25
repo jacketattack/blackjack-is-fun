@@ -175,18 +175,7 @@ function visualizePlayerHandsAndTotals() {
     }
 }
 
-function visualizePlayerHandAndTotal() {
-    // Backward compatibility - visualize the first hand only
-    const primaryHand = playerHands.length > 0 ? playerHands[0].cards : [];
-    const playerHandElement = document.getElementById('visualPlayerHand');
-    const playerTotalElement = document.getElementById('playerTotal');
-    if (playerHandElement) {
-        playerHandElement.textContent = stringifyHand(primaryHand);
-    }
-    if (playerTotalElement) {
-        playerTotalElement.textContent = getVisualTotal(getCardValuesFromHand(primaryHand));
-    }
-}
+
 
 function getVisualTotal(cardValues) {
     let blackjackTotal = calculateTotal(cardValues);
@@ -221,9 +210,6 @@ function stringifyHand(rawHand) {
         .join(' + ');
 }
 
-const PAIR_OF_ACES_VALUE = 12;
-const SOFT_ACE_VALUE = 1;
-const HARD_ACE_VALUE = 11;
 const IS_ACE = 1; 
 
 // takes in an array of card values
@@ -234,14 +220,14 @@ function calculateTotal(cardValues) {
     let blackJackValues = [];
 
 
-    for (cardValue of cardValues) {
-        let blackjackValue = convertCardValueToBlackjackValue(cardValue);
+    for (const cardValue of cardValues) {
+        const blackjackValue = convertCardValueToBlackjackValue(cardValue);
         blackJackValues.push(blackjackValue);
     }
 
     console.log({blackJackValues});
 
-    for (blackJackValue of blackJackValues) {
+    for (const blackJackValue of blackJackValues) {
         hardTotal += blackJackValue;
     }
 
@@ -392,13 +378,13 @@ function playForDealer() {
     visualizeDealerHandAndTotal();
 
     // check for result
-    finalDealerHard = calculateTotal(getCardValuesFromDealerHand()).hardValue;
-    finalDealerSoft = calculateTotal(getCardValuesFromDealerHand()).softValue; 
-    let finalDealerTotal = getTrueHandValue(finalDealerHard, finalDealerSoft);
+    const finalDealerHard = calculateTotal(getCardValuesFromDealerHand()).hardValue;
+    const finalDealerSoft = calculateTotal(getCardValuesFromDealerHand()).softValue; 
+    const finalDealerTotal = getTrueHandValue(finalDealerHard, finalDealerSoft);
 
-    finalPlayerHard = calculateTotal(getCardValuesFromPlayerHand()).hardValue;
-    finalPlayerSoft = calculateTotal(getCardValuesFromPlayerHand()).softValue; 
-    let finalPlayerTotal = getTrueHandValue(finalPlayerHard, finalPlayerSoft);
+    const finalPlayerHard = calculateTotal(getCardValuesFromPlayerHand()).hardValue;
+    const finalPlayerSoft = calculateTotal(getCardValuesFromPlayerHand()).softValue; 
+    const finalPlayerTotal = getTrueHandValue(finalPlayerHard, finalPlayerSoft);
 
 
     if (finalDealerTotal > 21) {
@@ -414,14 +400,16 @@ function playForDealer() {
 }
 
 function disableActionButtons() {
-    for (actionButton of document.getElementById('action-buttons').children) {
-        actionButton.setAttribute('disabled', true);
+    const actionButtons = document.getElementById('action-buttons').children;
+    for (let i = 0; i < actionButtons.length; i++) {
+        actionButtons[i].setAttribute('disabled', true);
     }
 }
 
 function enableActionButtons() {
-    for (actionButton of document.getElementById('action-buttons').children) {
-        actionButton.removeAttribute('disabled');
+    const actionButtons = document.getElementById('action-buttons').children;
+    for (let i = 0; i < actionButtons.length; i++) {
+        actionButtons[i].removeAttribute('disabled');
     }
 }
 
@@ -487,7 +475,6 @@ module.exports = {
     split,
     switchToHand,
     dealOneCard,
-    displayAllHands,
     stringifyHand,
     visualizePlayerHandsAndTotals,
     // For testing

@@ -5,7 +5,6 @@ import {
     resetShoe,
     getPenetrationLimit,
     getNumberOfDecks,
-    ShoeStatus,
 } from './deck'
 import { CardValue, CardSuit } from '../interfaces/card.interface'
 

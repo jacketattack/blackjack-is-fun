@@ -9,7 +9,7 @@ import * as deck from '../../services/deck'
 describe('Dealer Component', () => {
     afterEach(cleanup)
 
-    function mockDealHand(cards: any[]) {
+    function mockDealHand(cards: {value: string; suit: string}[]) {
         jest.spyOn(deck, 'dealHand').mockReturnValue({
             cards: cards,
             finished: false,

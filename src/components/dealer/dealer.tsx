@@ -1,4 +1,5 @@
-import { Dispatch, SetStateAction, useEffect, useState } from 'react'
+import { Dispatch, SetStateAction, useEffect, useState } from 'react';
+import * as React from 'react';
 
 import { BlackjackHand, Card } from '../../interfaces/card.interface'
 import { playDealerHand } from '../../services/dealerStrategy'
@@ -17,7 +18,7 @@ interface DealerState {
 }
 
 export const Dealer = (props: DealerProps) => {
-    let [dealerState, setDealerState]: [
+    const [dealerState, setDealerState]: [
         DealerState,
         Dispatch<SetStateAction<DealerState>>,
     ] = useState({

@@ -1,4 +1,5 @@
-import { useEffect } from 'react'
+import { useEffect } from 'react';
+import * as React from 'react';
 
 import useHandOfCardsTotal from '../../hooks/useHandOfCardsTotal'
 import { BlackjackHand } from '../../interfaces/card.interface'
