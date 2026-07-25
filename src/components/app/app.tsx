@@ -1,4 +1,5 @@
-import { Dispatch, SetStateAction, useState } from 'react'
+import { Dispatch, SetStateAction, useState } from 'react';
+import * as React from 'react';
 
 import { BlackjackHand, Card } from '../../interfaces/card.interface'
 import calculateHandOfCardsTotal from '../../services/handOfCardsCalculation'
@@ -7,17 +8,10 @@ import {
     dealerHasBlackjack,
 } from '../../services/insurance'
 import { Dealer } from '../dealer/dealer'
-<<<<<<< HEAD
-import { DeckStatus } from '../deck-status/deck-status'
-import { Insurance } from '../insurance/insurance'
-import { Bankroll } from '../bankroll/bankroll'
-import { HandHistory } from '../hand-history/hand-history'
-=======
 import { DeckStatus } from '../deck-status/deck-status'
 import { Bankroll } from '../bankroll/bankroll'
 import { HandHistory } from '../hand-history/hand-history'
 import { Insurance } from '../insurance/insurance'
->>>>>>> feature/36-deck-penetration
 import { Player } from '../player/player'
 import { Title } from '../title/title'
 
@@ -32,7 +26,7 @@ interface AppState {
 }
 
 export function App() {
-    let [appState, setAppState]: [
+    const [appState, setAppState]: [
         AppState,
         Dispatch<SetStateAction<AppState>>,
     ] = useState({

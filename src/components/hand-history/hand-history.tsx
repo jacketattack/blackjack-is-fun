@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useState } from 'react';
+import * as React from 'react';
 import { getHandHistory, clearHandHistory } from '../../services/handHistory'
 import { HandOutcome } from '../../services/handHistory'
 import * as styles from './hand-history.module.css'

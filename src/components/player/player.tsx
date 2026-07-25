@@ -1,4 +1,5 @@
-import { Dispatch, SetStateAction, useEffect, useState } from 'react'
+import { Dispatch, SetStateAction, useEffect, useState } from 'react';
+import * as React from 'react';
 import useHandOfCardsTotal from '../../hooks/useHandOfCardsTotal'
 
 import { BlackjackHand, Card } from '../../interfaces/card.interface'
@@ -24,7 +25,7 @@ interface PlayerState {
 }
 
 export const Player = (props: PlayerProps) => {
-    let [playerState, setPlayerState]: [
+    const [playerState, setPlayerState]: [
         PlayerState,
         Dispatch<SetStateAction<PlayerState>>,
     ] = useState({
@@ -176,7 +177,7 @@ export const Player = (props: PlayerProps) => {
     }
 
     function getNextActiveHandIndex(): number {
-        let updatedHandIndex: number = playerState.activeHandIndex + 1
+        const updatedHandIndex: number = playerState.activeHandIndex + 1
 
         return updatedHandIndex
     }

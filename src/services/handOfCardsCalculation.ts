@@ -24,7 +24,7 @@ function calculateHandOfCardsTotal(cards: Card[]): CardTotal {
         isSoft = true
     }
 
-    let total: number = isSoft ? hardTotal + 10 : hardTotal
+    const total: number = isSoft ? hardTotal + 10 : hardTotal
     return {
         total,
         isSoft,

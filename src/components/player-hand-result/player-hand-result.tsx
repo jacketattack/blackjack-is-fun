@@ -1,3 +1,4 @@
+import * as React from 'react';
 import * as styles from './player-hand-result.module.css'
 
 interface PlayerHandResultProps {
@@ -7,11 +8,11 @@ interface PlayerHandResultProps {
 
 export const PlayerHandResult = (props: PlayerHandResultProps) => {
     // need to display win/loss next to each hand
-    let didPlayerWin = hasPlayerWon(
+    const didPlayerWin = hasPlayerWon(
         props.dealerFinalTotal,
         props.playerFinalTotal
     )
-    let didPlayerPush = hasPlayerPushed(
+    const didPlayerPush = hasPlayerPushed(
         props.dealerFinalTotal,
         props.playerFinalTotal
     )

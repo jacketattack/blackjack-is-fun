@@ -1,4 +1,5 @@
 import { Card } from "../../interfaces/card.interface";
+import * as React from 'react';
 
 interface CardImageProps {
     card: Card;

@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react';
+import * as React from 'react';
 import {
     getShoeStatus,
     getPenetrationLimit,
@@ -9,7 +10,6 @@ import * as styles from './deck-status.module.css'
 export const DeckStatus = () => {
     const [shoeStatus, setShoeStatus] = useState(getShoeStatus())
     const [showNotification, setShowNotification] = useState(false)
-    const penetrationLimit = getPenetrationLimit()
     const numberOfDecks = getNumberOfDecks()
 
     useEffect(() => {

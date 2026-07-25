@@ -1,7 +1,7 @@
-import { fireEvent, render, screen, within } from '@testing-library/react'
+import { fireEvent, render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom'
 import { App } from './app'
-import React from 'react'
+import React from 'react';
 import * as deck from '../../services/deck'
 import { CardSuit, CardValue } from '../../interfaces/card.interface'
 

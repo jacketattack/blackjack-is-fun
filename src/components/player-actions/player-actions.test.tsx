@@ -1,4 +1,5 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen } from '@testing-library/react';
+import * as React from 'react';
 import '@testing-library/jest-dom'
 import { PlayerActions } from './player-actions'
 import { CardSuit, CardValue } from '../../interfaces/card.interface'
