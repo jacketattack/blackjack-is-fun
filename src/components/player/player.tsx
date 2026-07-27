@@ -171,20 +171,22 @@ export const Player = (props: PlayerProps) => {
         const updatedBettingState = splitBet(props.bettingState)
         props.onBettingStateChange(updatedBettingState)
 
-        const splitCard: Card =
-            playerState.blackjackHands[playerState.activeHandIndex].cards[0]
-        const currentBet =
-            playerState.blackjackHands[playerState.activeHandIndex].bet ||
-            props.bettingState.betAmount
+        const activeHand = playerState.blackjackHands[playerState.activeHandIndex]
+        const currentBet = activeHand.bet || props.bettingState.betAmount
+
+        // Check if the hand actually has a pair
+        if (activeHand.cards.length !== 2 || activeHand.cards[0].value !== activeHand.cards[1].value) {
+            return
+        }
 
         const splitHands: BlackjackHand[] = [
             {
-                cards: [splitCard, drawCard()],
+                cards: [activeHand.cards[0], drawCard()],
                 finished: false,
                 bet: currentBet,
             },
             {
-                cards: [splitCard, drawCard()],
+                cards: [activeHand.cards[1], drawCard()],
                 finished: false,
                 bet: currentBet,
             },
