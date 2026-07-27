@@ -7,17 +7,9 @@ import {
     dealerHasBlackjack,
 } from '../../services/insurance'
 import { Dealer } from '../dealer/dealer'
-<<<<<<< HEAD
 import { DeckStatus } from '../deck-status/deck-status'
 import { Insurance } from '../insurance/insurance'
-import { Bankroll } from '../bankroll/bankroll'
 import { HandHistory } from '../hand-history/hand-history'
-=======
-import { DeckStatus } from '../deck-status/deck-status'
-import { Bankroll } from '../bankroll/bankroll'
-import { HandHistory } from '../hand-history/hand-history'
-import { Insurance } from '../insurance/insurance'
->>>>>>> feature/36-deck-penetration
 import { Player } from '../player/player'
 import { Title } from '../title/title'
 
@@ -147,7 +139,6 @@ export function App() {
                     Insurance Lost. Dealer does not have Blackjack.
                 </div>
             )}
-            <Bankroll />
             <HandHistory />
         </div>
     )
